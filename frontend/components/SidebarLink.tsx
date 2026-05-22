@@ -6,6 +6,7 @@ interface SidebarLinkProps {
   label: string;
   iconPath: string;
   isActive?: boolean;
+  onClick?: () => void;
 }
 
 export default function SidebarLink({
@@ -13,10 +14,12 @@ export default function SidebarLink({
   label,
   iconPath,
   isActive = false,
+  onClick,
 }: SidebarLinkProps) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
         isActive
           ? "bg-[#eaeaea] text-[#1c1c1c] font-medium"
@@ -28,7 +31,7 @@ export default function SidebarLink({
         alt={label}
         width={20}
         height={20}
-        className={`w-5 h-5 transition-opacity ${isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100"}`}
+        className={`w-5 h-5 transition-opacity ${isActive ? "opacity-100" : "opacity-70"}`}
       />
       <span className="text-[15px]">{label}</span>
     </Link>

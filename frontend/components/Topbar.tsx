@@ -1,10 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Topbar() {
   return (
     <header className="bg-white rounded-[20px] px-6 py-3 flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.02)] select-none">
       <div className="flex items-center gap-4">
-        <button className="text-[#1c1c1c] hover:bg-[#f5f5f5] p-2 rounded-full transition-colors cursor-pointer">
+        <Link href="/" className="text-[#1c1c1c] hover:bg-[#f5f5f5] p-2 rounded-full transition-colors cursor-pointer inline-flex items-center justify-center">
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -17,7 +18,7 @@ export default function Topbar() {
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
           </svg>
-        </button>
+        </Link>
 
         <div className="flex items-center gap-2">
           <svg
@@ -60,12 +61,12 @@ export default function Topbar() {
         <div className="flex items-center gap-2 bg-[#f0f0f0] pl-2 pr-3 py-1.5 rounded-full hover:bg-[#e6e6e6] transition-colors cursor-pointer select-none">
           <div className="w-7 h-7 rounded-full bg-[#fde8e8] flex items-center justify-center overflow-hidden border border-orange-200">
             <Image 
-                src="/pfp.jpg"
-                alt="pfp"
-                width={36}
-                height={36}
-                className="w-8 h-8 object-cover"
-              />
+              src="/pfp.jpg"
+              alt="pfp"
+              width={36}
+              height={36}
+              className="w-8 h-8 object-cover"
+            />
           </div>
           <span className="text-sm font-bold text-[#1c1c1c] font-sans">
             John Doe
