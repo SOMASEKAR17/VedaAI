@@ -59,15 +59,13 @@ export default function Topbar() {
 
         <div className="flex items-center gap-2 bg-[#f0f0f0] pl-2 pr-3 py-1.5 rounded-full hover:bg-[#e6e6e6] transition-colors cursor-pointer select-none">
           <div className="w-7 h-7 rounded-full bg-[#fde8e8] flex items-center justify-center overflow-hidden border border-orange-200">
-            <svg viewBox="0 0 64 64" className="w-6 h-6 text-orange-600">
-              <circle cx="32" cy="32" r="30" fill="#FFE8E0" />
-              <circle cx="32" cy="26" r="12" fill="#F472B6" />
-              <rect x="20" y="24" width="24" height="6" rx="3" fill="#3B82F6" />
-              <circle cx="28" cy="25" r="2" fill="#FFFFFF" />
-              <circle cx="36" cy="25" r="2" fill="#FFFFFF" />
-              <path d="M 24 46 Q 32 40 40 46" fill="none" stroke="#EF4444" strokeWidth="3" strokeLinecap="round" />
-              <circle cx="32" cy="48" r="8" fill="#FBBF24" />
-            </svg>
+            <Image 
+                src="/pfp.jpg"
+                alt="pfp"
+                width={36}
+                height={36}
+                className="w-8 h-8 object-cover"
+              />
           </div>
           <span className="text-sm font-bold text-[#1c1c1c] font-sans">
             John Doe
