@@ -83,7 +83,9 @@ export default function Home() {
       </div>
 
       <div className="flex md:hidden flex-col gap-4 w-full pb-20">
-        <MobileHeader onMenuClick={handleOpen} />
+        <div className="fixed top-4 left-4 right-4 z-40">
+          <MobileHeader onMenuClick={handleOpen} /> 
+        </div>
         <EmptyState />
         <FAB />
         <div className="fixed bottom-4 left-4 right-4 z-40">
