@@ -20,25 +20,20 @@ export default function Topbar() {
           </svg>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <Link href="/create-assignment" className="flex items-center gap-1.5 text-[#a0a0a0] hover:text-[#1c1c1c] transition-colors select-none font-sans font-bold text-[13px] ml-2">
           <svg
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#7c7c7c"
-            strokeWidth="2"
+            stroke="currentColor"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-4 h-4"
+            className="w-3.5 h-3.5"
           >
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <path d="M12 3v4M12 17v4M3 12h4M17 12h4M7 7l2 2M15 15l2 2M7 17l2-2M15 9l2-2" />
           </svg>
-          <span className="text-[15px] font-medium text-[#7c7c7c] font-sans">
-            Assignment
-          </span>
-        </div>
+          <span>Create New</span>
+        </Link>
       </div>
 
       <div className="flex items-center gap-5">

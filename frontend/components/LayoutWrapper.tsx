@@ -77,15 +77,15 @@ export default function LayoutWrapper({
 
   return (
     <div className="flex w-full min-h-screen bg-[#ebebeb] p-4 gap-4 box-border overflow-x-hidden relative">
-      <div className="hidden md:flex gap-4 w-full">
-        <div className="fixed ">
+      <div className="hidden md:flex gap-4 w-full pl-[300px]">
+        <div className="fixed top-4 left-4 w-[280px]">
           <Sidebar />
         </div>
         <div className="flex-1 flex flex-col gap-4 min-w-0">
-          <div className="fixed left-80 right-10 z-40">
+          <div className="w-full z-45">
             <Topbar />
           </div>
-          <div className="pt-20 relative left-40 ">
+          <div className="w-full relative">
             {children}
           </div>
         </div>

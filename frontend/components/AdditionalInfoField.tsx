@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useAssignmentStore } from "@/store/useAssignmentStore";
 
 export default function AdditionalInfoField() {
-  const [text, setText] = useState("");
+  const { additionalInfo, setAdditionalInfo } = useAssignmentStore();
   const [isListening, setIsListening] = useState(false);
 
   const toggleListen = () => {
     setIsListening(!isListening);
     if (!isListening) {
       setTimeout(() => {
-        setText((prev) =>
-          prev ? prev + " with voice instructions added." : "Generate a 3-hour exam paper focused on advanced calculus."
+        setAdditionalInfo(
+          additionalInfo
+            ? additionalInfo + " with voice instructions added."
+            : "Generate a 3-hour exam paper focused on advanced calculus."
         );
         setIsListening(false);
       }, 2000);
@@ -31,8 +34,8 @@ export default function AdditionalInfoField() {
         }`}
       >
         <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
+          value={additionalInfo}
+          onChange={(e) => setAdditionalInfo(e.target.value)}
           placeholder={
             isListening
               ? "Listening to voice input..."

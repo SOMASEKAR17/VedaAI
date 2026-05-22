@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { useAssignmentStore } from "@/store/useAssignmentStore";
 import SidebarLink from "./SidebarLink";
 
 interface SidebarProps {
@@ -12,6 +14,13 @@ interface SidebarProps {
 
 export default function Sidebar({ isMobileDrawer = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const { assignments, loadAssignments } = useAssignmentStore();
+
+  useEffect(() => {
+    loadAssignments();
+  }, []);
+
+  const badgeCount = assignments.length > 0 ? assignments.length : 10;
 
   return (
     <aside
@@ -94,6 +103,7 @@ export default function Sidebar({ isMobileDrawer = false, onClose }: SidebarProp
             iconPath="/assignments.svg"
             isActive={pathname === "/" || pathname === "/assignments" || pathname === "/create-assignment"}
             onClick={onClose}
+            badge={badgeCount}
           />
           <SidebarLink
             href="#"

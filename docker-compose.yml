@@ -1,0 +1,45 @@
+version: "3.9"
+
+networks:
+  internal:
+  public:
+
+services:
+  mongo:
+    image: mongo:7
+    networks: [internal]
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+    ports:
+    - "27018:27017"  
+
+  redis:
+    image: redis:7-alpine
+    networks: [internal]
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    networks: [internal, public]
+    ports:
+      - "4000:4000"
+    env_file: ./backend/.env
+    depends_on: [mongo, redis]
+    restart: unless-stopped
+    volumes:
+      - pdf-storage:/app/generated-pdfs
+
+  frontend:
+    build: ./frontend
+    networks: [public]
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:4000
+    depends_on: [backend]
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+  pdf-storage:
