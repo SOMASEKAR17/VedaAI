@@ -399,7 +399,7 @@ export default function Assignments() {
 
       {deleteConfirmId && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in w-screen h-screen">
-          <div className="bg-white rounded-[24px] max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative animate-scale-up m-auto">
+          <div className="bg-white rounded-[24px] -translate-x-45 max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative animate-scale-up m-auto">
             <button
               onClick={() => {
                 setDeleteConfirmId(null);

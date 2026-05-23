@@ -20,7 +20,7 @@ export default function Sidebar({ isMobileDrawer = false, onClose }: SidebarProp
     loadAssignments();
   }, []);
 
-  const badgeCount = assignments.length > 0 ? assignments.length : 10;
+  const badgeCount = assignments.length > 0 ? assignments.length : 0;
 
   return (
     <aside

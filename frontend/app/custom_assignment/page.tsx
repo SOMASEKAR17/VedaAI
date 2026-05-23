@@ -199,7 +199,7 @@ function CustomAssignmentContent() {
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-44 sm:pb-32 animate-fade-in px-4 sm:px-0 text-left">
+    <div className="flex-1 mt-5 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-44 sm:pb-32 animate-fade-in px-4 sm:px-0 text-left">
       
       <div className="bg-[#252525] rounded-[28px] p-6 sm:p-8 text-white flex flex-col gap-4 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
         <div className="flex items-center gap-2">
@@ -367,7 +367,7 @@ function CustomAssignmentContent() {
         )}
       </div>
 
-      <div className="fixed bottom-4 left-4 right-4 md:left-[calc(16px+140px)] z-40 flex justify-center select-none max-w-4xl mx-auto w-full">
+      <div className="fixed bottom-4 left-1 z-40 flex justify-center select-none max-w-4xl mx-auto w-full">
         <div className="bg-white/95 backdrop-blur-md rounded-[24px] sm:rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-150 p-4 sm:py-3.5 sm:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 sm:gap-6 w-full animate-fade-in">
           <div className="flex flex-col text-left">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#7c7c7c] font-sans">Live Assessment Totals</span>

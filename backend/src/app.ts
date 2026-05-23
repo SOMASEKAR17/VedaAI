@@ -12,7 +12,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+      origin: [
+      "http://localhost:3000",
+      "http://16.170.226.123",
+      "http://vedaai.duckdns.org",  
+      "https://vedaai.duckdns.org", 
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })

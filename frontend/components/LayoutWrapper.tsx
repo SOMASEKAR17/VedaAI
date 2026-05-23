@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef,useEffect, useLayoutEffect } from "react";
 import gsap from "gsap";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -8,6 +8,8 @@ import MobileHeader from "./MobileHeader";
 import MobileBottomNav from "./MobileBottomNav";
 import FAB from "./FAB";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAssignmentStore } from "@/store/useAssignmentStore";
 
 export default function LayoutWrapper({
   children,
@@ -20,6 +22,7 @@ export default function LayoutWrapper({
   const drawerRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const shouldAnimateOpenRef = useRef(false);
+    const pathname = usePathname();
 
   useLayoutEffect(() => {
     if (!isRendered || !shouldAnimateOpenRef.current) return;
@@ -75,6 +78,10 @@ export default function LayoutWrapper({
       "<0.05"
     );
   };
+  const { assignments, loadAssignments } = useAssignmentStore();
+  useEffect(() => {
+      loadAssignments();
+    }, []);
 
   return (
     <div className="flex w-full min-h-screen bg-[#ebebeb] p-4 gap-4 box-border overflow-x-hidden relative">
@@ -90,7 +97,7 @@ export default function LayoutWrapper({
             {children}
             
           </div>
-          <div className="fixed bottom-0 left-74 right-0 z-[9999] pointer-events-none flex flex-col items-center select-none">
+         { pathname==="/"&& assignments.length > 0 &&(<div className="fixed bottom-0 left-74 right-0 z-[9999] pointer-events-none flex flex-col items-center select-none">
         
         <div
           className="absolute bottom-0 left-0 right-0 h-28"
@@ -113,7 +120,7 @@ export default function LayoutWrapper({
             Create Assignment
           </Link>
         </div>
-      </div>
+      </div>)}
         </div>
       </div>
 

@@ -12,7 +12,7 @@ services:
       - mongo-data:/data/db
     restart: unless-stopped
     ports:
-    - "27018:27017"  
+    - "27017"  
 
   redis:
     image: redis:7-alpine
@@ -34,9 +34,9 @@ services:
     build: ./frontend
     networks: [public]
     ports:
-      - "3000:3000"
+      - "8080:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:4000
+      - NEXT_PUBLIC_API_URL=http://16.170.226.123:4000
     depends_on: [backend]
     restart: unless-stopped
 
