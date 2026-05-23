@@ -23,6 +23,7 @@ export interface IQuestion {
   marks: number;
   options: string[];
   answer: string;
+  regenerateRound?: number;
 }
 
 export interface ISection {
@@ -46,6 +47,7 @@ export interface IAssignment {
   status: AssignmentStatus;
   jobId: string;
   resultId: Types.ObjectId | null;
+  regenerateCount: number;
   createdAt: Date;
   updatedAt: Date;
 }

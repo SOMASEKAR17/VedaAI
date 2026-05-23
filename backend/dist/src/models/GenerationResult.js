@@ -47,6 +47,7 @@ const QuestionSchema = new mongoose_1.Schema({
     marks: { type: Number, required: true, min: 1 },
     options: { type: [String], default: [] },
     answer: { type: String, default: '' },
+    regenerateRound: { type: Number, default: 0 },
 }, { _id: false });
 const SectionSchema = new mongoose_1.Schema({
     title: { type: String, required: true },

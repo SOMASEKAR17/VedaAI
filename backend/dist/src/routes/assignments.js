@@ -65,17 +65,11 @@ const createAssignmentSchema = zod_1.z.object({
     message: 'Total marks must be at least equal to total questions (each question worth at least 1 mark)',
     path: ['totalMarks'],
 });
-// POST /api/assignments - Create new assignment
 router.post('/', upload_1.upload.single('file'), upload_1.extractFileText, (0, validate_1.validate)(createAssignmentSchema), assignmentController_1.createAssignment);
-// GET /api/assignments - Get all assignments
 router.get('/', assignmentController_1.getAllAssignments);
-// GET /api/assignments/:id - Get single assignment with result
 router.get('/:id', assignmentController_1.getAssignmentById);
-// GET /api/assignments/:id/status - Lightweight status check
 router.get('/:id/status', assignmentController_1.getAssignmentStatus);
-// DELETE /api/assignments/:id - Delete assignment
 router.delete('/:id', assignmentController_1.deleteAssignment);
-// POST /api/assignments/:id/regenerate - Regenerate assignment
 router.post('/:id/regenerate', assignmentController_1.regenerateAssignment);
 exports.default = router;
 //# sourceMappingURL=assignments.js.map

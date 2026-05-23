@@ -26,7 +26,6 @@ export async function createAssignment(
       uploadedFileText,
     } = req.body;
 
-    // Create the assignment in MongoDB
     const assignment = await Assignment.create({
       title,
       subject,
@@ -40,9 +39,9 @@ export async function createAssignment(
       uploadedFileText: uploadedFileText || '',
       status: 'pending',
       resultId: null,
+      regenerateCount: 0,
     });
 
-    // Prepare job data
     const jobData: AssignmentJobData = {
       assignmentId: assignment._id.toString(),
       title: assignment.title,
@@ -56,16 +55,13 @@ export async function createAssignment(
       uploadedFileText: assignment.uploadedFileText,
     };
 
-    // Push to BullMQ queue
     const job = await generationQueue.add('generate-questions', jobData, {
       jobId: `gen-${assignment._id.toString()}`,
     });
 
-    // Update assignment with job ID
     assignment.jobId = job.id || '';
     await assignment.save();
 
-    // Set initial Redis cache
     await redisClient.set(`assignment:status:${assignment._id}`, 'pending');
 
     res.status(201).json({
@@ -111,7 +107,6 @@ export async function getAssignmentById(
 
     let result = null;
     if (assignment.status === 'completed' && assignment.resultId) {
-      // Check Redis cache first
       const cachedResult = await redisClient.get(`assignment:result:${id}`);
       if (cachedResult) {
         result = JSON.parse(cachedResult);
@@ -140,7 +135,6 @@ export async function getAssignmentStatus(
   try {
     const { id } = req.params;
 
-    // Check Redis cache first
     const cachedStatus = await redisClient.get(`assignment:status:${id}`);
     if (cachedStatus) {
       res.status(200).json({
@@ -151,7 +145,6 @@ export async function getAssignmentStatus(
       return;
     }
 
-    // Fallback to MongoDB
     const assignment = await Assignment.findById(id).select('status jobId').lean();
     if (!assignment) {
       throw new AppError('Assignment not found', 404);
@@ -206,7 +199,10 @@ export async function regenerateAssignment(
       throw new AppError('Assignment not found', 404);
     }
 
-    // Extract previous questions from the existing result, preserving the history in DB
+    if ((assignment.regenerateCount || 0) >= 5) {
+      throw new AppError('Maximum cap of 5 regenerations reached for this assignment', 400);
+    }
+
     let previousQuestions: string[] = [];
     if (assignment.resultId) {
       const prevResult = await GenerationResult.findById(assignment.resultId);
@@ -215,14 +211,12 @@ export async function regenerateAssignment(
           s.questions.map((q) => q.text)
         );
       }
-      assignment.resultId = null;
     }
 
-    // Reset status to pending
+    assignment.regenerateCount = (assignment.regenerateCount || 0) + 1;
     assignment.status = 'pending';
     await assignment.save();
 
-    // Prepare job data
     const jobData: AssignmentJobData = {
       assignmentId: assignment._id.toString(),
       title: assignment.title,
@@ -237,20 +231,16 @@ export async function regenerateAssignment(
       previousQuestions,
     };
 
-    // Push new job to BullMQ queue
     const job = await generationQueue.add('generate-questions', jobData, {
       jobId: `gen-${assignment._id.toString()}-${Date.now()}`,
     });
 
-    // Update assignment with new job ID
     assignment.jobId = job.id || '';
     await assignment.save();
 
-    // Reset Redis status cache
     await redisClient.set(`assignment:status:${assignment._id}`, 'pending');
     await redisClient.del(`assignment:result:${assignment._id}`);
 
-    // Emit event so WS clients know immediately
     emitToClient(assignment._id.toString(), 'generation:started', { assignmentId: assignment._id.toString() });
 
     res.status(200).json({

@@ -47,12 +47,10 @@ export default function AssignmentDetailsModal({
     try {
       const success = await downloadPDF(assignment._id, assignment.title);
       if (success) {
-        console.log("PDF download successful");
       } else {
         alert("Failed to generate PDF. Please verify backend Puppeteer setup.");
       }
     } catch (err) {
-      console.error(err);
     } finally {
       setIsDownloading(false);
     }
@@ -60,7 +58,7 @@ export default function AssignmentDetailsModal({
 
   const sections = assignment.result?.sections || [];
 
-  // Helper to derive a clean duration based on total marks
+
   const getDuration = (marks: number) => {
     if (marks <= 20) return "45 minutes";
     if (marks <= 50) return "1.5 Hours";
@@ -70,10 +68,10 @@ export default function AssignmentDetailsModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in select-none">
-      {/* Modal Container */}
+
       <div className="bg-[#ebebeb] w-full max-w-4xl h-[90vh] rounded-[32px] overflow-hidden shadow-2xl flex flex-col border border-white/20 animate-scale-up">
         
-        {/* Header Bar */}
+
         <div className="bg-white border-b border-[#f0f0f0] px-6 py-4.5 flex justify-between items-center shrink-0">
           <div className="flex flex-col text-left gap-0.5">
             <h2 className="text-base font-bold text-[#1c1c1c] font-sans tracking-tight">
@@ -117,13 +115,13 @@ export default function AssignmentDetailsModal({
           </div>
         </div>
 
-        {/* Scrollable Document Area */}
+
         <div className="flex-1 overflow-y-auto p-6 sm:p-10 flex justify-center bg-[#ebebeb] scrollbar-thin">
           
-          {/* Mock Printed Exam Paper Sheet (DPS Bokaro Styling Reference) */}
+
           <div className="bg-white max-w-2xl w-full min-h-[842px] shadow-lg border border-[#e0e0e0] rounded-[2px] p-8 sm:p-12 text-[#111111] flex flex-col text-left font-serif leading-relaxed relative">
             
-            {/* School Banner Header */}
+
             <div className="flex flex-col items-center text-center gap-1.5 border-b-2 border-[#111111] pb-4 mb-6">
               <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wide font-sans text-[#1a1a1a]">
                 Delhi Public School, Bokaro Steel City
@@ -138,13 +136,13 @@ export default function AssignmentDetailsModal({
               </div>
             </div>
 
-            {/* Time / Marks Row */}
+
             <div className="flex justify-between items-center text-xs sm:text-sm font-bold border-b border-[#e0e0e0] pb-2 mb-6 font-sans">
               <span>Time Allowed: {getDuration(assignment.totalMarks)}</span>
               <span>Maximum Marks: {assignment.totalMarks}</span>
             </div>
 
-            {/* Instructions */}
+
             <div className="text-[11px] sm:text-xs font-semibold mb-6 border-b border-[#e0e0e0] pb-3.5 font-sans">
               <p className="mb-1 uppercase tracking-wider text-[#777]">General Instructions:</p>
               <ul className="list-disc pl-5 flex flex-col gap-1 text-[#444]">
@@ -155,7 +153,7 @@ export default function AssignmentDetailsModal({
               </ul>
             </div>
 
-            {/* Student ID block */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm font-sans mb-8 border border-dashed border-[#dcdcdc] p-4 rounded-lg bg-gray-50/50">
               <div className="flex gap-2">
                 <span className="font-bold shrink-0">Name:</span>
@@ -171,7 +169,7 @@ export default function AssignmentDetailsModal({
               </div>
             </div>
 
-            {/* Questions Section */}
+
             {sections.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center gap-2 text-gray-400 py-20 font-sans">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-12 h-12 text-gray-300">
@@ -188,7 +186,7 @@ export default function AssignmentDetailsModal({
               <div className="flex flex-col gap-8 flex-1 pb-10">
                 {sections.map((section, sIdx) => (
                   <div key={sIdx} className="flex flex-col gap-4">
-                    {/* Section Header */}
+
                     <div className="flex flex-col items-center text-center border-b border-[#111111] pb-1.5 mb-1">
                       <h2 className="text-base sm:text-lg font-bold uppercase tracking-wider font-sans">
                         {section.title}
@@ -198,12 +196,12 @@ export default function AssignmentDetailsModal({
                       </p>
                     </div>
 
-                    {/* Section Questions */}
+
                     <div className="flex flex-col gap-6">
                       {section.questions.map((q, qIdx) => (
                         <div key={qIdx} className="flex flex-col gap-2 relative group pl-2">
                           
-                          {/* Question header row */}
+
                           <div className="flex items-start gap-2.5">
                             <span className="font-bold font-sans shrink-0 min-w-[28px]">
                               Q{q.questionNumber}.
@@ -229,7 +227,7 @@ export default function AssignmentDetailsModal({
                             </div>
                           </div>
 
-                          {/* MCQ Options Display */}
+
                           {q.options && q.options.length > 0 && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 pl-[38px] mt-1.5 font-sans">
                               {q.options.map((opt, optIdx) => {
@@ -250,7 +248,7 @@ export default function AssignmentDetailsModal({
                   </div>
                 ))}
 
-                {/* Footer line */}
+
                 <div className="border-t-2 border-[#111111] pt-4 mt-8 flex justify-center shrink-0">
                   <span className="text-xs font-bold uppercase tracking-widest font-sans text-gray-400">
                     --- End of Question Paper ---

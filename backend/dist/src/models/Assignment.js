@@ -65,6 +65,7 @@ const AssignmentSchema = new mongoose_1.Schema({
     },
     jobId: { type: String, default: '' },
     resultId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'GenerationResult', default: null },
+    regenerateCount: { type: Number, default: 0 },
 }, {
     timestamps: true,
 });

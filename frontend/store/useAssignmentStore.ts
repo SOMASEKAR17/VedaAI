@@ -11,7 +11,6 @@ export interface QuestionTypeRow {
 export type Difficulty = "easy" | "medium" | "hard" | "mixed";
 
 interface AssignmentState {
-  // New input fields
   title: string;
   subject: string;
   gradeLevel: string;
@@ -21,15 +20,12 @@ interface AssignmentState {
   dueDate: string;
   questionTypes: QuestionTypeRow[];
   additionalInfo: string;
-  
-  // Validation and status
+
   errors: Record<string, string>;
   isSubmittedOnce: boolean;
 
-  // Cached list of assignments from DB
   assignments: any[];
 
-  // Action setters
   setTitle: (title: string) => void;
   setSubject: (subject: string) => void;
   setGradeLevel: (gradeLevel: string) => void;
@@ -39,7 +35,6 @@ interface AssignmentState {
   setDueDate: (date: string) => void;
   setAssignments: (assignments: any[]) => void;
 
-  // Core list modifier methods
   addQuestionType: () => void;
   removeQuestionType: (id: string) => void;
   updateQuestionType: (id: string, type: string) => void;
@@ -49,7 +44,6 @@ interface AssignmentState {
   decrementQuestionMarks: (id: string) => void;
   setAdditionalInfo: (text: string) => void;
 
-  // Actions
   validateForm: () => boolean;
   resetForm: () => void;
   loadAssignments: () => Promise<void>;
@@ -188,7 +182,7 @@ export const useAssignmentStore = create<AssignmentState>((set, get) => ({
     } else {
       const selectedDate = new Date(dueDate);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // normalize today to midnight
+      today.setHours(0, 0, 0, 0);
       if (isNaN(selectedDate.getTime()) || selectedDate <= today) {
         newErrors.dueDate = "Due date must be a valid future date";
       }

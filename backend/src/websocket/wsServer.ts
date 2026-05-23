@@ -19,9 +19,8 @@ export function initWebSocketServer(server: HTTPServer): WebSocketServer {
         if (message.type === 'register' && message.assignmentId) {
           registeredId = message.assignmentId;
           clientRegistry.set(registeredId, ws);
-          console.log(`WebSocket client registered for assignment: ${registeredId}`);
 
-          // Send acknowledgment
+
           ws.send(
             JSON.stringify({
               event: 'registered',
@@ -30,19 +29,17 @@ export function initWebSocketServer(server: HTTPServer): WebSocketServer {
           );
         }
       } catch {
-        // Silently ignore malformed messages
       }
     });
 
     ws.on('close', () => {
       if (registeredId) {
         clientRegistry.delete(registeredId);
-        console.log(`WebSocket client disconnected for assignment: ${registeredId}`);
+
       }
     });
 
     ws.on('error', () => {
-      // Silently handle errors
       if (registeredId) {
         clientRegistry.delete(registeredId);
       }
@@ -50,10 +47,10 @@ export function initWebSocketServer(server: HTTPServer): WebSocketServer {
   });
 
   wss.on('error', (error: Error) => {
-    console.error('WebSocket server error:', error.message);
+
   });
 
-  console.log('✅ WebSocket server initialized');
+
   return wss;
 }
 
@@ -68,25 +65,22 @@ export function emitToClient(
       client.send(JSON.stringify({ event, payload }));
     }
   } catch {
-    // Fire-and-forget: never crash on WebSocket emission
   }
 }
 
 export function closeWebSocketServer(): Promise<void> {
   return new Promise((resolve) => {
     if (wss) {
-      // Close all client connections
       clientRegistry.forEach((ws) => {
         try {
           ws.close();
         } catch {
-          // Ignore close errors
         }
       });
       clientRegistry.clear();
 
       wss.close(() => {
-        console.log('WebSocket server closed');
+
         resolve();
       });
     } else {

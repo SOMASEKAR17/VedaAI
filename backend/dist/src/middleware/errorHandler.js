@@ -14,8 +14,6 @@ class AppError extends Error {
 }
 exports.AppError = AppError;
 function errorHandler(err, _req, res, _next) {
-    console.error('Error:', err.message);
-    console.error(err.stack);
     if (err instanceof AppError) {
         res.status(err.statusCode).json({
             success: false,
@@ -24,7 +22,6 @@ function errorHandler(err, _req, res, _next) {
         });
         return;
     }
-    // Handle Multer errors
     if (err.message && err.code === 'LIMIT_FILE_SIZE') {
         res.status(400).json({
             success: false,
@@ -41,7 +38,6 @@ function errorHandler(err, _req, res, _next) {
         });
         return;
     }
-    // Handle Mongoose validation errors
     if (err.name === 'ValidationError') {
         res.status(400).json({
             success: false,
@@ -50,7 +46,6 @@ function errorHandler(err, _req, res, _next) {
         });
         return;
     }
-    // Handle Mongoose CastError (invalid ObjectId)
     if (err.name === 'CastError') {
         res.status(400).json({
             success: false,
@@ -59,7 +54,6 @@ function errorHandler(err, _req, res, _next) {
         });
         return;
     }
-    // Default 500 error
     res.status(500).json({
         success: false,
         error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,

@@ -11,26 +11,55 @@ function ensurePdfDir(): void {
   }
 }
 
-function buildHTML(result: IGenerationResult, withAnswerKey: boolean = false): string {
+function getDuration(marks: number): string {
+  if (marks <= 20) return '45 minutes';
+  if (marks <= 50) return '1.5 Hours';
+  if (marks <= 80) return '2.5 Hours';
+  return '3 Hours';
+}
+
+function getDifficultyLabel(difficulty: string): string {
+  const d = difficulty.toLowerCase().trim();
+  if (d === 'easy') return 'Easy';
+  if (d === 'hard') return 'Challenging';
+  return 'Moderate';
+}
+
+function buildHTML(result: IGenerationResult, assignment: any, withAnswerKey: boolean = false): string {
+  let questionNumberCounter = 1;
+
   const sectionsHTML = result.sections
     .map((section) => {
       const questionsHTML = section.questions
         .map((q) => {
+          const displayNum = questionNumberCounter++;
           const optionsHTML =
             q.options.length > 0
-              ? `<div class="options">${q.options.map((opt) => `<div class="option">${opt}</div>`).join('')}</div>`
+              ? `
+                <div class="options-grid">
+                  ${q.options
+                    .map((opt, optIdx) => {
+                      const labels = ['A', 'B', 'C', 'D'];
+                      const cleanOpt = opt.replace(/^[A-D]\.\s*/i, '');
+                      return `
+                        <div class="option">
+                          <span class="option-label">${labels[optIdx]}.</span>
+                          <span class="option-text">${cleanOpt}</span>
+                        </div>
+                      `;
+                    })
+                    .join('')}
+                </div>
+              `
               : '';
 
-          const difficultyClass = q.difficulty;
           return `
             <div class="question">
               <div class="question-header">
-                <span class="q-number">Q${q.questionNumber}.</span>
+                <span class="q-number">${displayNum}.</span>
+                <span class="q-difficulty">[${getDifficultyLabel(q.difficulty)}]</span>
                 <span class="q-text">${q.text}</span>
-                <span class="q-meta">
-                  <span class="difficulty-badge ${difficultyClass}">${q.difficulty.toUpperCase()}</span>
-                  <span class="marks-badge">[${q.marks} mark${q.marks > 1 ? 's' : ''}]</span>
-                </span>
+                <span class="q-marks">[${q.marks} Mark${q.marks > 1 ? 's' : ''}]</span>
               </div>
               ${optionsHTML}
             </div>
@@ -40,9 +69,13 @@ function buildHTML(result: IGenerationResult, withAnswerKey: boolean = false): s
 
       return `
         <div class="section">
-          <h2 class="section-title">${section.title}</h2>
-          <p class="section-instruction"><em>${section.instruction}</em></p>
-          ${questionsHTML}
+          <div class="section-header">
+            <h3 class="section-title">${section.title}</h3>
+            <p class="section-instruction"><em>${section.instruction}</em></p>
+          </div>
+          <div class="questions-list">
+            ${questionsHTML}
+          </div>
         </div>
       `;
     })
@@ -50,13 +83,15 @@ function buildHTML(result: IGenerationResult, withAnswerKey: boolean = false): s
 
   let answerKeyHTML = '';
   if (withAnswerKey) {
+    let ansNum = 1;
     const answersList = result.sections
       .flatMap((s) => s.questions)
       .map((q) => {
-        const ans = q.answer || `Ideal response for this question (valued at ${q.marks} Marks).`;
+        const ans = q.answer || `Ideal response should correctly define the core concept, explain its theoretical background, list practical applications, and include relevant chemical equations or diagrams where applicable (valued at ${q.marks} Marks).`;
         return `
           <div class="answer-item">
-            <strong>Q${q.questionNumber}.</strong> ${ans}
+            <span class="ans-number"><strong>${ansNum++}.</strong></span>
+            <span class="ans-text">${ans}</span>
           </div>
         `;
       })
@@ -65,13 +100,17 @@ function buildHTML(result: IGenerationResult, withAnswerKey: boolean = false): s
     answerKeyHTML = `
       <div class="page-break"></div>
       <div class="answer-key-section">
-        <h2 class="section-title">Answer Key</h2>
+        <h3 class="answer-key-header">Answer Key:</h3>
         <div class="answers-list">
           ${answersList}
         </div>
       </div>
     `;
   }
+
+  const subject = assignment?.subject || 'Science';
+  const gradeLevel = assignment?.gradeLevel || 'Class 8th';
+  const totalMarks = result.totalMarks;
 
   return `
     <!DOCTYPE html>
@@ -81,129 +120,205 @@ function buildHTML(result: IGenerationResult, withAnswerKey: boolean = false): s
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          font-family: 'Times New Roman', Times, serif;
+          font-family: 'Inter', system-ui, -apple-system, sans-serif;
           padding: 40px;
-          color: #1a1a1a;
-          line-height: 1.6;
+          color: #1c1c1c;
+          line-height: 1.5;
+          background: #ffffff;
         }
         .header {
           text-align: center;
-          border-bottom: 2px solid #333;
-          padding-bottom: 20px;
-          margin-bottom: 30px;
+          margin-bottom: 24px;
         }
         .header h1 {
-          font-size: 24px;
-          margin-bottom: 5px;
+          font-size: 20px;
+          font-weight: 800;
+          margin-bottom: 6px;
           text-transform: uppercase;
-          letter-spacing: 2px;
+          letter-spacing: 0.5px;
+          color: #1c1c1c;
         }
-        .header .subtitle {
-          font-size: 14px;
-          color: #555;
+        .header h3 {
+          font-size: 13px;
+          font-weight: 700;
+          color: #333333;
+          margin-bottom: 2px;
         }
-        .meta {
+        .meta-row {
           display: flex;
           justify-content: space-between;
+          font-size: 13px;
+          font-weight: 800;
+          border-bottom: 2px solid #1c1c1c;
+          padding-bottom: 6px;
+          margin-bottom: 20px;
+          color: #1c1c1c;
+        }
+        .instructions {
           font-size: 12px;
-          margin-bottom: 30px;
-          padding: 10px;
-          background: #f5f5f5;
-          border-radius: 4px;
+          font-weight: 700;
+          border-bottom: 1px solid #ebebeb;
+          padding-bottom: 10px;
+          margin-bottom: 20px;
+          color: #1c1c1c;
+        }
+        .student-info {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          font-size: 12px;
+          font-weight: 700;
+          margin-bottom: 24px;
+          max-width: 450px;
+        }
+        .student-info .info-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 16px;
+        }
+        .main-section-title {
+          text-align: center;
+          font-size: 14px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          margin-bottom: 20px;
+          color: #1c1c1c;
         }
         .section {
-          margin-bottom: 30px;
+          margin-bottom: 24px;
+        }
+        .section-header {
+          border-bottom: 1px solid #f0f0f0;
+          padding-bottom: 3px;
+          margin-bottom: 12px;
         }
         .section-title {
-          font-size: 18px;
-          border-bottom: 1px solid #ccc;
-          padding-bottom: 5px;
-          margin-bottom: 10px;
-          color: #2c3e50;
+          font-size: 13px;
+          font-weight: 800;
+          color: #1c1c1c;
         }
         .section-instruction {
-          font-size: 13px;
-          color: #666;
-          margin-bottom: 15px;
+          font-size: 11px;
+          font-style: italic;
+          color: #7c7c7c;
+          margin-top: 1px;
+        }
+        .questions-list {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
         .question {
-          margin-bottom: 18px;
-          padding-left: 10px;
+          padding-left: 4px;
         }
         .question-header {
-          display: flex;
-          align-items: flex-start;
-          gap: 8px;
-          margin-bottom: 8px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #1c1c1c;
+          line-height: 1.4;
         }
         .q-number {
-          font-weight: bold;
-          min-width: 35px;
+          font-weight: 800;
         }
-        .q-text {
-          flex: 1;
+        .q-difficulty {
+          font-weight: 600;
+          color: #f06e30;
         }
-        .q-meta {
-          display: flex;
-          gap: 8px;
-          flex-shrink: 0;
+        .q-marks {
+          font-weight: 800;
+          color: #1c1c1c;
         }
-        .difficulty-badge {
-          font-size: 10px;
-          padding: 2px 8px;
-          border-radius: 10px;
-          text-transform: uppercase;
-          font-weight: bold;
-        }
-        .difficulty-badge.easy { background: #d4edda; color: #155724; }
-        .difficulty-badge.medium { background: #fff3cd; color: #856404; }
-        .difficulty-badge.hard { background: #f8d7da; color: #721c24; }
-        .marks-badge {
-          font-size: 11px;
-          font-weight: bold;
-          color: #2c3e50;
-        }
-        .options {
-          padding-left: 45px;
-          margin-top: 5px;
+        .options-grid {
+          display: grid;
+          grid-template-cols: 1fr 1fr;
+          gap: 4px 20px;
+          padding-left: 20px;
+          margin-top: 4px;
         }
         .option {
-          margin-bottom: 4px;
-          font-size: 14px;
+          font-size: 11px;
+          font-weight: 600;
+          color: #4a4a4a;
+          display: flex;
+          gap: 3px;
         }
-        .footer {
-          text-align: center;
-          margin-top: 40px;
-          padding-top: 15px;
-          border-top: 1px solid #ccc;
-          font-size: 12px;
-          color: #888;
+        .option-label {
+          font-weight: 800;
+          color: #1c1c1c;
+        }
+        .end-marker {
+          display: flex;
+          justify-content: center;
+          border-bottom: 2px dashed #ebebeb;
+          padding-bottom: 20px;
+          margin: 24px 0;
+        }
+        .end-marker span {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 2px;
+          color: #7c7c7c;
+          text-transform: uppercase;
         }
         .page-break {
           page-break-before: always;
         }
         .answer-key-section {
-          margin-top: 30px;
+          margin-top: 16px;
+        }
+        .answer-key-header {
+          font-size: 15px;
+          font-weight: 800;
+          color: #1c1c1c;
+          margin-bottom: 12px;
+        }
+        .answers-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
         }
         .answer-item {
-          margin-bottom: 12px;
-          font-size: 14px;
-          line-height: 1.5;
+          font-size: 12px;
+          font-weight: 600;
+          color: #4c4c4c;
+          line-height: 1.4;
+        }
+        .ans-number {
+          font-weight: 800;
+          color: #1c1c1c;
         }
       </style>
     </head>
     <body>
       <div class="header">
-        <h1>Question Paper</h1>
-        <div class="subtitle">Generated by VedaAI Assessment Creator</div>
+        <h1>Delhi Public School, Sector-4, Bokaro</h1>
+        <h3>Subject: ${subject}</h3>
+        <h3>Class: ${gradeLevel}</h3>
       </div>
-      <div class="meta">
-        <span>Total Marks: ${result.totalMarks}</span>
-        <span>Date: ${new Date(result.generatedAt).toLocaleDateString()}</span>
+      <div class="meta-row">
+        <span>Time Allowed: ${getDuration(totalMarks)}</span>
+        <span>Maximum Marks: ${totalMarks}</span>
       </div>
+      <div class="instructions">
+        <p><strong>General Instructions:</strong></p>
+        <p>All questions are compulsory unless stated otherwise.</p>
+      </div>
+      <div class="student-info">
+        <div class="info-row">
+          <span>Name: ________________________</span>
+          <span>Roll Number: _______________</span>
+        </div>
+        <div class="info-row">
+          <span>Class: ${gradeLevel} Section: ___________</span>
+        </div>
+      </div>
+      
+      <div class="main-section-title">Section A</div>
+      
       ${sectionsHTML}
-      <div class="footer">
-        --- End of Question Paper ---
+      <div class="end-marker">
+        <span>End of Question Paper</span>
       </div>
       ${answerKeyHTML}
     </body>
@@ -211,10 +326,15 @@ function buildHTML(result: IGenerationResult, withAnswerKey: boolean = false): s
   `;
 }
 
-export async function generatePDF(result: IGenerationResult, withAnswerKey: boolean = false): Promise<string> {
+export async function generatePDF(
+  result: IGenerationResult,
+  assignment: any,
+  withAnswerKey: boolean = false,
+  suffix: string = ''
+): Promise<string> {
   ensurePdfDir();
 
-  const filePath = path.join(PDF_DIR, `assignment-${result.assignmentId}${withAnswerKey ? '-key' : ''}.pdf`);
+  const filePath = path.join(PDF_DIR, `assignment-${result.assignmentId}${withAnswerKey ? '-key' : ''}${suffix}.pdf`);
 
   const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
 
@@ -226,7 +346,7 @@ export async function generatePDF(result: IGenerationResult, withAnswerKey: bool
 
   try {
     const page = await browser.newPage();
-    const html = buildHTML(result, withAnswerKey);
+    const html = buildHTML(result, assignment, withAnswerKey);
     await page.setContent(html, { waitUntil: 'networkidle0' });
     await page.pdf({
       path: filePath,

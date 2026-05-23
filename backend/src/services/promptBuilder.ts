@@ -3,7 +3,6 @@ import { AssignmentJobData } from '../types';
 export function buildPrompt(assignment: AssignmentJobData): string {
   const { subject, gradeLevel, questionTypes, totalQuestions, totalMarks, difficulty, additionalInstructions, uploadedFileText, previousQuestions } = assignment;
 
-  // Calculate question distribution across types
   const questionsPerType = Math.floor(totalQuestions / questionTypes.length);
   const remainder = totalQuestions % questionTypes.length;
   const breakdown = questionTypes
@@ -13,7 +12,6 @@ export function buildPrompt(assignment: AssignmentJobData): string {
     })
     .join('\n  - ');
 
-  // Build difficulty instruction
   let difficultyInstruction: string;
   if (difficulty === 'mixed') {
     difficultyInstruction = 'Distribute questions evenly across easy, medium, and hard difficulty levels.';
@@ -21,17 +19,14 @@ export function buildPrompt(assignment: AssignmentJobData): string {
     difficultyInstruction = `All questions should be of "${difficulty}" difficulty.`;
   }
 
-  // Build file context section
   const fileContext = uploadedFileText
     ? `\nReference Material (use this as context for generating questions):\n"""\n${uploadedFileText.substring(0, 8000)}\n"""\n`
     : '';
 
-  // Build additional instructions section
   const additionalSection = additionalInstructions
     ? `\nAdditional Instructions from the teacher:\n${additionalInstructions}\n`
     : '';
 
-  // Build previous questions constraint section
   const previousQuestionsSection = previousQuestions && previousQuestions.length > 0
     ? `\nCRITICAL: Do NOT repeat or generate any of the following questions that were previously generated for this assignment. All new questions must be completely different, fresh, and distinct from these:\n- ${previousQuestions.map(q => q.trim()).join('\n- ')}\n`
     : '';

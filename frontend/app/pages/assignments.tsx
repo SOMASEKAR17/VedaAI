@@ -5,31 +5,35 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAssignmentStore } from "@/store/useAssignmentStore";
 import EmptyState from "@/components/EmptyState";
-import AssignmentDetailsModal from "@/components/AssignmentDetailsModal";
+
 import AssignmentTracker from "@/components/AssignmentTracker";
-import { downloadPDF, fetchAssignmentDetails, deleteAssignment } from "@/lib/api";
+import { downloadPDF, deleteAssignment } from "@/lib/api";
 
 export default function Assignments() {
   const router = useRouter();
   const { assignments, loadAssignments } = useAssignmentStore();
-  const [selectedAssignment, setSelectedAssignment] = useState<any | null>(null);
+
   const [activeTrackerId, setActiveTrackerId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-  // Filter & Search states
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filterSubject, setFilterSubject] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Active three dots dropdown card ID
+
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-  // Initial load on mount
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+
   useEffect(() => {
     loadAssignments();
   }, []);
 
-  // Listen globally to close dropdowns when clicking outside
+
   useEffect(() => {
     const handleGlobalClick = () => {
       setActiveDropdownId(null);
@@ -39,7 +43,7 @@ export default function Assignments() {
     return () => window.removeEventListener("click", handleGlobalClick);
   }, []);
 
-  // Auto-polling: if any assignment is pending or processing, poll the DB every 5 seconds
+
   useEffect(() => {
     const hasActiveJobs = assignments.some(
       (asg) => asg.status === "pending" || asg.status === "processing"
@@ -47,43 +51,37 @@ export default function Assignments() {
 
     if (hasActiveJobs) {
       const interval = setInterval(() => {
-        console.log("Active generation jobs detected. Refreshing list...");
+
         loadAssignments();
       }, 5000);
       return () => clearInterval(interval);
     }
   }, [assignments]);
 
-  // Route to the detailed paper viewer page
+
   const handleViewDetails = (asgId: string) => {
     router.push(`/assignments/${asgId}`);
   };
 
-  // Download PDF
+
   const handleDownloadPDF = async (asgId: string, title: string) => {
     setDownloadingId(asgId);
     try {
       await downloadPDF(asgId, title);
     } catch (err) {
-      console.error(err);
+
     } finally {
       setDownloadingId(null);
     }
   };
 
-  // Delete Assignment
-  const handleDeleteAssignment = async (asgId: string) => {
-    if (confirm("Are you sure you want to delete this assignment?")) {
-      const success = await deleteAssignment(asgId);
-      if (success) {
-        loadAssignments();
-      } else {
-        alert("Failed to delete assignment. Ensure backend is active.");
-      }
-    }
+
+  const handleDeleteAssignment = (asgId: string) => {
+    setDeleteConfirmId(asgId);
+    setDeleteErrorMessage(null);
   };
 
-  // Format date to DD-MM-YYYY format matching screenshot
+
   const formatToDDMMYYYY = (dateStr: string) => {
     try {
       const d = new Date(dateStr);
@@ -97,17 +95,17 @@ export default function Assignments() {
     }
   };
 
-  // Get list of unique subjects for filter options
+
   const uniqueSubjects = Array.from(new Set(assignments.map((asg) => asg.subject)));
 
-  // Filter and Search logic
+
   const filteredAssignments = assignments.filter((asg) => {
     const matchesSearch = asg.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSubject = filterSubject ? asg.subject === filterSubject : true;
     return matchesSearch && matchesSubject;
   });
 
-  // Render empty state if no assignments exist
+
   if (!assignments || assignments.length === 0) {
     return <EmptyState />;
   }
@@ -115,7 +113,7 @@ export default function Assignments() {
   return (
     <div className="flex-1 flex flex-col gap-6 select-none max-w-6xl mx-auto w-full pb-32 animate-fade-in pr-4">
       
-      {/* Tracker overlay if the user clicks a processing card to watch live progress */}
+
       {activeTrackerId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div className="bg-white rounded-[32px] overflow-hidden max-w-2xl w-full shadow-2xl p-6 relative">
@@ -132,8 +130,12 @@ export default function Assignments() {
               <AssignmentTracker
                 assignmentId={activeTrackerId}
                 onComplete={() => {
+                  const id = activeTrackerId;
                   setActiveTrackerId(null);
                   loadAssignments();
+                  if (id) {
+                    router.push(`/assignments/${id}`);
+                  }
                 }}
                 onCancel={() => setActiveTrackerId(null)}
               />
@@ -142,10 +144,10 @@ export default function Assignments() {
         </div>
       )}
 
-      {/* Header section matching screenshot */}
+
       <div className="flex flex-col gap-0.5 text-left px-1 mt-2">
         <div className="flex items-center gap-2">
-          {/* Green dot status indicator */}
+
           <div className="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-white shadow-sm shrink-0" />
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1c1c1c] font-sans">
             Assignments
@@ -156,10 +158,10 @@ export default function Assignments() {
         </p>
       </div>
 
-      {/* Filter and Search Bar matching screenshot */}
+
       <div className="w-full bg-white rounded-[20px] px-6 py-3.5 flex items-center justify-between shadow-[0_4px_16px_rgba(0,0,0,0.015)] border border-[#f0f0f0]/50 gap-4 mb-2 select-none">
         
-        {/* Left Side: Filter Dropdown */}
+
         <div className="relative" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -204,7 +206,7 @@ export default function Assignments() {
           )}
         </div>
 
-        {/* Right Side: Search Input Pill */}
+
         <div className="relative w-full sm:w-[280px]">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3.5 h-3.5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2">
             <circle cx="11" cy="11" r="8" />
@@ -220,7 +222,7 @@ export default function Assignments() {
         </div>
       </div>
 
-      {/* Grid of assessments - 2 Columns Grid matching screenshot */}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6.5 w-full px-1">
         {filteredAssignments.map((asg) => {
           const isPending = asg.status === "pending";
@@ -239,7 +241,7 @@ export default function Assignments() {
                   : "cursor-default"
               }`}
             >
-              {/* Three dots menu button (top-right corner) */}
+
               <div className="absolute top-7 right-7" onClick={(e) => e.stopPropagation()}>
                 <button
                   onClick={() => setActiveDropdownId(isDropdownOpen ? null : asg._id)}
@@ -252,7 +254,7 @@ export default function Assignments() {
                   </svg>
                 </button>
 
-                {/* Dropdown Menu matching screenshot */}
+
                 {isDropdownOpen && (
                   <div className="absolute top-10 right-0 bg-white rounded-[18px] shadow-[0_8px_28px_rgba(0,0,0,0.08)] border border-[#f0f0f0]/60 py-2 min-w-[160px] z-30 animate-fade-in text-left">
                     <button
@@ -270,16 +272,24 @@ export default function Assignments() {
                     </button>
 
                     {isCompleted && (
-                      <button
-                        onClick={() => {
-                          setActiveDropdownId(null);
-                          handleDownloadPDF(asg._id, asg.title);
-                        }}
-                        disabled={downloadingId === asg._id}
-                        className="w-full text-left px-5 py-2.5 text-xs font-bold text-[#1c1c1c] hover:bg-[#f8f8f8] transition-colors cursor-pointer flex items-center justify-between font-sans disabled:opacity-50"
-                      >
-                        {downloadingId === asg._id ? "Downloading..." : "Download PDF"}
-                      </button>
+                      <>
+                        <Link
+                          href={`/custom_assignment?id=${asg._id}`}
+                          className="block w-full text-left px-5 py-2.5 text-xs font-bold text-[#1c1c1c] hover:bg-[#f8f8f8] transition-colors cursor-pointer font-sans"
+                        >
+                          Customize Questions
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setActiveDropdownId(null);
+                            handleDownloadPDF(asg._id, asg.title);
+                          }}
+                          disabled={downloadingId === asg._id}
+                          className="w-full text-left px-5 py-2.5 text-xs font-bold text-[#1c1c1c] hover:bg-[#f8f8f8] transition-colors cursor-pointer flex items-center justify-between font-sans disabled:opacity-50"
+                        >
+                          {downloadingId === asg._id ? "Downloading..." : "Download PDF"}
+                        </button>
+                      </>
                     )}
 
                     <button
@@ -295,12 +305,12 @@ export default function Assignments() {
                 )}
               </div>
 
-              {/* Title Section (Spans 1 or 2 lines) */}
+
               <div className="flex flex-col text-left pr-8">
                 <h3 className="text-xl sm:text-[22px] font-extrabold text-[#1c1c1c] font-sans leading-snug tracking-tight line-clamp-2">
                   {asg.title}
                 </h3>
-                {/* Optional status metadata for queued/processing cards */}
+
                 {(isProcessing || isPending || isFailed) && (
                   <div className="mt-2 select-none">
                     {isProcessing && (
@@ -326,15 +336,15 @@ export default function Assignments() {
                 )}
               </div>
 
-              {/* Bottom Row matching screenshot EXACTLY */}
+
               <div className="flex justify-between items-center w-full mt-6 text-[#7c7c7c] text-xs sm:text-[13px] font-semibold font-sans">
                 
-                {/* Left Side: Assigned on Date */}
+
                 <span>
                   Assigned on : <strong className="font-extrabold text-[#1c1c1c]">{formatToDDMMYYYY(asg.createdAt)}</strong>
                 </span>
 
-                {/* Right Side: Due Date */}
+
                 <span>
                   Due : <strong className="font-extrabold text-[#1c1c1c]">{formatToDDMMYYYY(asg.dueDate)}</strong>
                 </span>
@@ -346,7 +356,7 @@ export default function Assignments() {
         })}
       </div>
 
-      {/* Center Floating Bottom "+ Create Assignment" Button matching screenshot */}
+
       <div className="fixed bottom-8 left-[50%] md:left-[calc(50%+140px)] transform -translate-x-1/2 z-40 select-none">
         <Link
           href="/create-assignment"
@@ -359,12 +369,84 @@ export default function Assignments() {
         </Link>
       </div>
 
-      {/* Details modal overlay */}
-      {selectedAssignment && (
-        <AssignmentDetailsModal
-          assignment={selectedAssignment}
-          onClose={() => setSelectedAssignment(null)}
-        />
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-[24px] max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative animate-scale-up">
+            <button
+              onClick={() => {
+                setDeleteConfirmId(null);
+                setDeleteErrorMessage(null);
+              }}
+              className="absolute right-4 top-4 text-gray-400 hover:text-gray-650 p-1.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div className="flex flex-col gap-1.5 mt-2">
+              <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-1 shrink-0">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
+              </div>
+              <h3 className="text-base font-extrabold text-[#1c1c1c]">Delete Assignment</h3>
+              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+                Are you sure you want to permanently delete this assignment? This action cannot be undone.
+              </p>
+              {deleteErrorMessage && (
+                <div className="text-[11px] font-bold text-red-600 bg-red-50 p-2.5 rounded-lg mt-1 leading-normal">
+                  {deleteErrorMessage}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 mt-2">
+              <button
+                disabled={isDeleting}
+                onClick={async () => {
+                  setIsDeleting(true);
+                  setDeleteErrorMessage(null);
+                  try {
+                    const success = await deleteAssignment(deleteConfirmId);
+                    if (success) {
+                      loadAssignments();
+                      setDeleteConfirmId(null);
+                    } else {
+                      setDeleteErrorMessage("Failed to delete assignment. Ensure backend is active.");
+                    }
+                  } catch (err: any) {
+                    setDeleteErrorMessage(err.message || "An unexpected error occurred.");
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                className="w-full bg-[#e15222] hover:bg-[#c9451a] disabled:bg-red-400 text-white py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete Assignment"
+                )}
+              </button>
+              <button
+                disabled={isDeleting}
+                onClick={() => {
+                  setDeleteConfirmId(null);
+                  setDeleteErrorMessage(null);
+                }}
+                className="w-full bg-white hover:bg-gray-50 border border-gray-200 text-[#1c1c1c] py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

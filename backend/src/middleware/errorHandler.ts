@@ -18,8 +18,7 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  console.error('Error:', err.message);
-  console.error(err.stack);
+
 
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
@@ -30,7 +29,6 @@ export function errorHandler(
     return;
   }
 
-  // Handle Multer errors
   if (err.message && (err as any).code === 'LIMIT_FILE_SIZE') {
     res.status(400).json({
       success: false,
@@ -49,7 +47,6 @@ export function errorHandler(
     return;
   }
 
-  // Handle Mongoose validation errors
   if (err.name === 'ValidationError') {
     res.status(400).json({
       success: false,
@@ -59,7 +56,6 @@ export function errorHandler(
     return;
   }
 
-  // Handle Mongoose CastError (invalid ObjectId)
   if (err.name === 'CastError') {
     res.status(400).json({
       success: false,
@@ -69,7 +65,6 @@ export function errorHandler(
     return;
   }
 
-  // Default 500 error
   res.status(500).json({
     success: false,
     error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,

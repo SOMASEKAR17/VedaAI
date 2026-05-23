@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useAssignmentStore, Difficulty } from "@/store/useAssignmentStore";
+import { useAssignmentStore } from "@/store/useAssignmentStore";
 import { createAssignment } from "@/lib/api";
 import UploadZone from "@/components/UploadZone";
 import DatePickerField from "@/components/DatePickerField";
@@ -18,7 +18,7 @@ export default function CreateAssignment() {
   const [createdAssignmentId, setCreatedAssignmentId] = useState<string | null>(null);
 
   const {
-    // Input states
+
     title,
     subject,
     gradeLevel,
@@ -29,13 +29,13 @@ export default function CreateAssignment() {
     file,
     errors,
     
-    // Setters
+
     setTitle,
     setSubject,
     setGradeLevel,
     setDifficulty,
     
-    // Actions
+
     validateForm,
     resetForm,
   } = useAssignmentStore();
@@ -43,10 +43,16 @@ export default function CreateAssignment() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const isValid = validateForm();
-    if (!isValid) return;
+    if (!isValid) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
 
     setIsSubmitting(true);
     setErrorMsg(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
 
     try {
       const totalQuestions = questionTypes.reduce((sum, row) => sum + row.count, 0);
@@ -68,35 +74,33 @@ export default function CreateAssignment() {
         formData.append("file", file);
       }
 
-      console.log("Submitting form data to backend API...", {
-        title,
-        subject,
-        gradeLevel,
-        dueDate,
-        totalQuestions,
-        totalMarks,
-        difficulty,
-      });
+
 
       const res = await createAssignment(formData);
       
       if (res.success && res.assignmentId) {
-        console.log(`Assignment created successfully in DB. ID: ${res.assignmentId}. Initializing real-time tracking...`);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
         setCreatedAssignmentId(res.assignmentId);
       } else {
         setErrorMsg(res.error || "Failed to create assignment");
         setIsSubmitting(false);
       }
     } catch (err: any) {
-      console.error(err);
+
       setErrorMsg(err.message || "An unexpected error occurred");
       setIsSubmitting(false);
     }
   };
 
   const handleTrackerComplete = () => {
+    const id = createdAssignmentId;
     resetForm();
-    router.push("/");
+    if (id) {
+      router.push(`/assignments/${id}`);
+    } else {
+      router.push("/");
+    }
   };
 
   const handleTrackerCancel = () => {
@@ -104,92 +108,83 @@ export default function CreateAssignment() {
     setIsSubmitting(false);
   };
 
-  // Extract unique validation errors
   const uniqueErrorMessages = Array.from(
     new Set(Object.keys(errors).map((key) => errors[key]))
   );
 
-  // If successfully submitted, render the real-time tracking dashboard
-  if (createdAssignmentId) {
-    return (
-      <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-10">
-        <div className="flex flex-col gap-1 w-full px-1 mb-2">
-          <div className="flex items-center gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-[#f06e30] border-2 border-white shadow-sm shrink-0 animate-ping" />
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1c1c1c] font-sans">
-              AI Assessment Creator
-            </h1>
-          </div>
-          <p className="text-[13px] sm:text-sm text-[#7c7c7c] font-medium font-sans">
-            Real-time status updates from our generation engine
-          </p>
-        </div>
-        <AssignmentTracker
-          assignmentId={createdAssignmentId}
-          onComplete={handleTrackerComplete}
-          onCancel={handleTrackerCancel}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-10">
+      
       <div className="flex flex-col gap-1 w-full px-1">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#22c55e] border-2 border-white shadow-sm shrink-0" />
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1c1c1c] font-sans">
-            Create Assignment
+        <div className="flex items-center gap-2 transition-all duration-500">
+          {createdAssignmentId ? (
+            <div className="w-3.5 h-3.5 rounded-full bg-[#f06e30] border-2 border-white shadow-sm shrink-0 animate-ping" />
+          ) : (
+            <div className="w-3 h-3 rounded-full bg-[#22c55e] border-2 border-white shadow-sm shrink-0" />
+          )}
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1c1c1c] font-sans transition-all duration-300">
+            {createdAssignmentId ? "AI Assessment Creator" : "Create Assignment"}
           </h1>
         </div>
-        <p className="text-[13px] sm:text-sm text-[#7c7c7c] font-medium font-sans">
-          Set up a new assignment for your students
+        <p className="text-[13px] sm:text-sm text-[#7c7c7c] font-medium font-sans transition-all duration-300">
+          {createdAssignmentId 
+            ? "Real-time status updates from our generation engine" 
+            : "Set up a new assignment for your students"}
         </p>
 
         <div className="w-full bg-[#e5e5e5] h-1 rounded-full overflow-hidden mt-6 flex gap-1">
-          <div className="w-1/3 bg-[#2d2d2d] h-full rounded-full" />
-          <div className="w-2/3 h-full bg-transparent" />
+          <div 
+            className="bg-[#2d2d2d] h-full rounded-full transition-all duration-500 ease-in-out" 
+            style={{ width: createdAssignmentId ? '66.666%' : '33.333%' }}
+          />
         </div>
       </div>
 
-      {uniqueErrorMessages.length > 0 && (
-        <div className="bg-[#fdf5f2] border border-[#e15222]/30 rounded-[20px] p-4.5 flex gap-3.5 items-start animate-fade-in">
-          <div className="w-6 h-6 rounded-full bg-[#e15222] text-white flex items-center justify-center shrink-0 text-xs font-bold font-sans">
-            !
-          </div>
-          <div className="flex flex-col gap-1">
-            <h4 className="text-sm font-bold text-[#e15222] font-sans tracking-tight">
-              Please fix the following validation errors:
-            </h4>
-            <ul className="list-disc pl-5 text-xs text-[#7c7c7c] font-medium font-sans flex flex-col gap-1 mt-1">
-              {uniqueErrorMessages.map((msg, index) => (
-                <li key={index} className="leading-relaxed">
-                  {msg}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+      <div className="overflow-hidden w-full relative">
+        <div 
+          className="flex transition-transform duration-500 ease-in-out w-[200%]"
+          style={{ transform: createdAssignmentId ? 'translateX(-50%)' : 'translateX(0%)' }}
+        >
+          <div className="w-1/2 shrink-0 pr-1 flex flex-col gap-6">
+            
+            {uniqueErrorMessages.length > 0 && (
+              <div className="bg-[#fdf5f2] border border-[#e15222]/30 rounded-[20px] p-4.5 flex gap-3.5 items-start animate-fade-in">
+                <div className="w-6 h-6 rounded-full bg-[#e15222] text-white flex items-center justify-center shrink-0 text-xs font-bold font-sans">
+                  !
+                </div>
+                <div className="flex flex-col gap-1">
+                  <h4 className="text-sm font-bold text-[#e15222] font-sans tracking-tight">
+                    Please fix the following validation errors:
+                  </h4>
+                  <ul className="list-disc pl-5 text-xs text-[#7c7c7c] font-medium font-sans flex flex-col gap-1 mt-1">
+                    {uniqueErrorMessages.map((msg, index) => (
+                      <li key={index} className="leading-relaxed">
+                        {msg}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
 
-      {errorMsg && (
-        <div className="bg-[#fdf5f2] border border-[#e15222]/30 rounded-[20px] p-4.5 flex gap-3.5 items-start animate-fade-in text-[#e15222]">
-          <div className="w-6 h-6 rounded-full bg-[#e15222] text-white flex items-center justify-center shrink-0 text-xs font-bold font-sans">
-            !
-          </div>
-          <div className="flex flex-col gap-1">
-            <h4 className="text-sm font-bold text-[#e15222] font-sans tracking-tight">
-              Server/Network Error:
-            </h4>
-            <p className="text-xs text-[#7c7c7c] font-medium mt-1">{errorMsg}</p>
-          </div>
-        </div>
-      )}
+            {errorMsg && (
+              <div className="bg-[#fdf5f2] border border-[#e15222]/30 rounded-[20px] p-4.5 flex gap-3.5 items-start animate-fade-in text-[#e15222]">
+                <div className="w-6 h-6 rounded-full bg-[#e15222] text-white flex items-center justify-center shrink-0 text-xs font-bold font-sans">
+                  !
+                </div>
+                <div className="flex flex-col gap-1">
+                  <h4 className="text-sm font-bold text-[#e15222] font-sans tracking-tight">
+                    Server/Network Error:
+                  </h4>
+                  <p className="text-xs text-[#7c7c7c] font-medium mt-1">{errorMsg}</p>
+                </div>
+              </div>
+            )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-[28px] shadow-[0_6px_24px_rgba(0,0,0,0.02)] border border-[#f0f0f0]/50 p-5 sm:p-8 flex flex-col gap-6 sm:gap-7 w-full relative animate-fade-in"
-      >
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-[28px] shadow-[0_6px_24px_rgba(0,0,0,0.02)] border border-[#f0f0f0]/50 p-5 sm:p-8 flex flex-col gap-6 sm:gap-7 w-full relative animate-fade-in"
+            >
         <div className="flex flex-col gap-0.5 border-b border-[#f5f5f5] pb-4">
           <h2 className="text-lg font-bold text-[#1c1c1c] font-sans tracking-tight">
             Assignment Details
@@ -199,7 +194,6 @@ export default function CreateAssignment() {
           </p>
         </div>
 
-        {/* Title input */}
         <div className="flex flex-col gap-2 w-full">
           <label className="text-sm font-bold text-[#1c1c1c] font-sans tracking-tight">
             Assignment Title
@@ -222,9 +216,7 @@ export default function CreateAssignment() {
           )}
         </div>
 
-        {/* Subject & Grade grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5.5">
-          {/* Subject Select */}
           <div className="flex flex-col gap-2 w-full">
             <label className="text-sm font-bold text-[#1c1c1c] font-sans tracking-tight">
               Subject
@@ -270,7 +262,6 @@ export default function CreateAssignment() {
             )}
           </div>
 
-          {/* Grade Level select */}
           <div className="flex flex-col gap-2 w-full">
             <label className="text-sm font-bold text-[#1c1c1c] font-sans tracking-tight">
               Grade Level / Class
@@ -317,7 +308,6 @@ export default function CreateAssignment() {
           </div>
         </div>
 
-        {/* Difficulty Segment Selector */}
         <div className="flex flex-col gap-2 w-full">
           <label className="text-sm font-bold text-[#1c1c1c] font-sans tracking-tight font-sans">
             Difficulty Level
@@ -408,6 +398,21 @@ export default function CreateAssignment() {
           </svg>
         </button>
       </div>
+
+      </div>
+
+      <div className="w-1/2 shrink-0 pl-1">
+        {createdAssignmentId && (
+          <AssignmentTracker
+            assignmentId={createdAssignmentId}
+            onComplete={handleTrackerComplete}
+            onCancel={handleTrackerCancel}
+          />
+        )}
+      </div>
+
     </div>
+  </div>
+</div>
   );
 }

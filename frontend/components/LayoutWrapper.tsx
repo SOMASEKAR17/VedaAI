@@ -85,7 +85,7 @@ export default function LayoutWrapper({
           <div className="w-full z-45">
             <Topbar />
           </div>
-          <div className="w-full relative">
+          <div className="w-full relative animate-slide-up">
             {children}
           </div>
         </div>
@@ -95,7 +95,9 @@ export default function LayoutWrapper({
         <div className="fixed top-4 left-4 right-4 z-40">
           <MobileHeader onMenuClick={handleOpen} />
         </div>
-        {children}
+        <div className="w-full animate-slide-up">
+          {children}
+        </div>
         <FAB />
         <div className="fixed bottom-4 left-4 right-4 z-40">
           <MobileBottomNav />

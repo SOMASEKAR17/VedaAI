@@ -34,6 +34,7 @@ const AssignmentSchema = new Schema<AssignmentDocument>(
     },
     jobId: { type: String, default: '' },
     resultId: { type: Schema.Types.ObjectId, ref: 'GenerationResult', default: null },
+    regenerateCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

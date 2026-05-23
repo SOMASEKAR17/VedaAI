@@ -34,13 +34,12 @@ export default function AssignmentTracker({
 
   useEffect(() => {
     const socketUrl = `${WS_BASE_URL}`;
-    console.log(`Connecting to WebSocket: ${socketUrl}`);
+
     const ws = new WebSocket(socketUrl);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log("WebSocket connection established");
-      // Register for updates on this assignmentId
+
       ws.send(
         JSON.stringify({
           type: "register",
@@ -52,10 +51,10 @@ export default function AssignmentTracker({
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        console.log("WebSocket event received:", message);
+
 
         if (message.event === "registered") {
-          console.log(`Successfully registered client for assignment ID: ${assignmentId}`);
+
         } else if (message.event === "generation:started") {
           updateStepStatus(3, "processing");
           updateStepStatus(4, "pending");
@@ -79,16 +78,16 @@ export default function AssignmentTracker({
           setErrorMessage(message.payload.error || "Generation failed in the queue worker");
         }
       } catch (err) {
-        console.error("Failed to parse WebSocket message:", err);
+
       }
     };
 
     ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
+
     };
 
     ws.onclose = () => {
-      console.log("WebSocket connection closed");
+
     };
 
     return () => {

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { Assignment } from '../models/Assignment';
 import { GenerationResult } from '../models/GenerationResult';
 import { redisClient } from '../config/redis';
 import { generatePDF } from '../services/pdfService';
@@ -13,7 +14,6 @@ export async function getResultByAssignmentId(
   try {
     const { assignmentId } = req.params;
 
-    // Check Redis cache first
     const cachedResult = await redisClient.get(`assignment:result:${assignmentId}`);
     if (cachedResult) {
       res.status(200).json({
@@ -23,7 +23,6 @@ export async function getResultByAssignmentId(
       return;
     }
 
-    // Fallback to MongoDB
     const result = await GenerationResult.findOne({ assignmentId }).lean();
     if (!result) {
       throw new AppError('Result not found for this assignment', 404);
@@ -46,25 +45,67 @@ export async function generateResultPDF(
   try {
     const { assignmentId } = req.params;
     const withAnswerKey = req.body.withAnswerKey === true || req.query.withAnswerKey === 'true';
+    const keptQuestionNumbers = req.body.keptQuestionNumbers;
+
+    const assignment = await Assignment.findById(assignmentId).lean();
+    if (!assignment) {
+      throw new AppError('Assignment not found', 404);
+    }
+    const currentCount = assignment.regenerateCount || 0;
 
     const result = await GenerationResult.findOne({ assignmentId }).lean();
     if (!result) {
       throw new AppError('Result not found for this assignment', 404);
     }
 
-    // Cast to IGenerationResult for the PDF service
-    const resultData = result as unknown as IGenerationResult;
+    let resultData = result as unknown as IGenerationResult;
+    let suffix = '';
 
-    const pdfPath = await generatePDF(resultData, withAnswerKey);
+    if (Array.isArray(keptQuestionNumbers)) {
+      suffix = '-custom';
+      const filteredSections = result.sections.map((section) => {
+        const filteredQuestions = section.questions.filter((q) =>
+          keptQuestionNumbers.includes(q.questionNumber)
+        );
+        return {
+          ...section,
+          questions: filteredQuestions,
+        };
+      }).filter((section) => section.questions.length > 0);
 
-    // Update the result with PDF path if generated without key
-    if (!withAnswerKey) {
+      resultData = {
+        ...result,
+        sections: filteredSections,
+      } as unknown as IGenerationResult;
+    } else {
+      let nextNum = 1;
+      const filteredSections = result.sections.map((section) => {
+        const filteredQuestions = section.questions
+          .filter((q) => (q.regenerateRound ?? 0) === currentCount)
+          .map((q) => ({
+            ...q,
+            questionNumber: nextNum++,
+          }));
+        return {
+          ...section,
+          questions: filteredQuestions,
+        };
+      }).filter((section) => section.questions.length > 0);
+
+      resultData = {
+        ...result,
+        sections: filteredSections,
+      } as unknown as IGenerationResult;
+    }
+
+    const pdfPath = await generatePDF(resultData, assignment, withAnswerKey, suffix);
+
+    if (!withAnswerKey && !suffix) {
       await GenerationResult.findByIdAndUpdate(result._id, { pdfPath });
     }
 
-    const filename = `assignment-${assignmentId}${withAnswerKey ? '-key' : ''}.pdf`;
+    const filename = `assignment-${assignmentId}${withAnswerKey ? '-key' : ''}${suffix}.pdf`;
 
-    // Send the PDF file as a download
     res.download(pdfPath, filename, (err) => {
       if (err) {
         next(new AppError('Failed to send PDF file', 500));

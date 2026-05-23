@@ -9,14 +9,12 @@ const env_1 = require("./env");
 exports.redisClient = new ioredis_1.default({
     host: env_1.env.REDIS_HOST,
     port: env_1.env.REDIS_PORT,
-    maxRetriesPerRequest: null, // Required for BullMQ
+    maxRetriesPerRequest: null,
     enableReadyCheck: false,
 });
 exports.redisClient.on('connect', () => {
-    console.log('✅ Redis connected successfully');
 });
 exports.redisClient.on('error', (err) => {
-    console.error('Redis connection error:', err);
 });
 exports.redisConnection = {
     host: env_1.env.REDIS_HOST,

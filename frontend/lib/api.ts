@@ -8,9 +8,7 @@ export interface ApiResponse<T = any> {
   error?: string;
 }
 
-/**
- * Fetch all assignments from the backend
- */
+
 export async function fetchAssignments(): Promise<any[]> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/assignments`);
@@ -19,15 +17,12 @@ export async function fetchAssignments(): Promise<any[]> {
     }
     const result: ApiResponse<any[]> = await res.json();
     return result.success ? result.data || [] : [];
-  } catch (error) {
-    console.error("Error in fetchAssignments:", error);
+  } catch {
     return [];
   }
 }
 
-/**
- * Fetch a single assignment's full details (with generation results if completed)
- */
+
 export async function fetchAssignmentDetails(id: string): Promise<any | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/assignments/${id}`);
@@ -36,15 +31,12 @@ export async function fetchAssignmentDetails(id: string): Promise<any | null> {
     }
     const result: ApiResponse<any> = await res.json();
     return result.success ? result.data || null : null;
-  } catch (error) {
-    console.error(`Error in fetchAssignmentDetails for ID ${id}:`, error);
+  } catch {
     return null;
   }
 }
 
-/**
- * Submit a new assignment (multipart form-data)
- */
+
 export async function createAssignment(formData: FormData): Promise<{ success: boolean; assignmentId?: string; error?: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/assignments`, {
@@ -62,22 +54,19 @@ export async function createAssignment(formData: FormData): Promise<{ success: b
       assignmentId: data.assignmentId,
     };
   } catch (error: any) {
-    console.error("Error in createAssignment API:", error);
     return { success: false, error: error.message || "Network error occurred while creating assignment" };
   }
 }
 
-/**
- * Request PDF generation and download it directly in browser
- */
-export async function downloadPDF(assignmentId: string, title: string, withAnswerKey: boolean = false): Promise<boolean> {
+
+export async function downloadPDF(assignmentId: string, title: string, withAnswerKey: boolean = false, keptQuestionNumbers?: number[]): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/results/${assignmentId}/pdf`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ withAnswerKey }),
+      body: JSON.stringify({ withAnswerKey, keptQuestionNumbers }),
     });
 
     if (!res.ok) {
@@ -95,15 +84,12 @@ export async function downloadPDF(assignmentId: string, title: string, withAnswe
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
     return true;
-  } catch (error) {
-    console.error("Error downloading PDF:", error);
+  } catch {
     return false;
   }
 }
 
-/**
- * Delete an assignment from the database
- */
+
 export async function deleteAssignment(id: string): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/assignments/${id}`, {
@@ -114,15 +100,12 @@ export async function deleteAssignment(id: string): Promise<boolean> {
     }
     const result: ApiResponse = await res.json();
     return result.success;
-  } catch (error) {
-    console.error(`Error in deleteAssignment for ID ${id}:`, error);
+  } catch {
     return false;
   }
 }
 
-/**
- * Request questions regeneration for an assignment
- */
+
 export async function regenerateAssignment(id: string): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE_URL}/api/assignments/${id}/regenerate`, {
@@ -133,8 +116,7 @@ export async function regenerateAssignment(id: string): Promise<boolean> {
     }
     const result: ApiResponse = await res.json();
     return result.success;
-  } catch (error) {
-    console.error(`Error in regenerateAssignment for ID ${id}:`, error);
+  } catch {
     return false;
   }
 }

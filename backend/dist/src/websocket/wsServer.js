@@ -16,8 +16,6 @@ function initWebSocketServer(server) {
                 if (message.type === 'register' && message.assignmentId) {
                     registeredId = message.assignmentId;
                     clientRegistry.set(registeredId, ws);
-                    console.log(`WebSocket client registered for assignment: ${registeredId}`);
-                    // Send acknowledgment
                     ws.send(JSON.stringify({
                         event: 'registered',
                         payload: { assignmentId: registeredId },
@@ -25,26 +23,21 @@ function initWebSocketServer(server) {
                 }
             }
             catch {
-                // Silently ignore malformed messages
             }
         });
         ws.on('close', () => {
             if (registeredId) {
                 clientRegistry.delete(registeredId);
-                console.log(`WebSocket client disconnected for assignment: ${registeredId}`);
             }
         });
         ws.on('error', () => {
-            // Silently handle errors
             if (registeredId) {
                 clientRegistry.delete(registeredId);
             }
         });
     });
     wss.on('error', (error) => {
-        console.error('WebSocket server error:', error.message);
     });
-    console.log('✅ WebSocket server initialized');
     return wss;
 }
 function emitToClient(assignmentId, event, payload) {
@@ -55,24 +48,20 @@ function emitToClient(assignmentId, event, payload) {
         }
     }
     catch {
-        // Fire-and-forget: never crash on WebSocket emission
     }
 }
 function closeWebSocketServer() {
     return new Promise((resolve) => {
         if (wss) {
-            // Close all client connections
             clientRegistry.forEach((ws) => {
                 try {
                     ws.close();
                 }
                 catch {
-                    // Ignore close errors
                 }
             });
             clientRegistry.clear();
             wss.close(() => {
-                console.log('WebSocket server closed');
                 resolve();
             });
         }

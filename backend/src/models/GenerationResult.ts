@@ -16,6 +16,7 @@ const QuestionSchema = new Schema<IQuestion>(
     marks: { type: Number, required: true, min: 1 },
     options: { type: [String], default: [] },
     answer: { type: String, default: '' },
+    regenerateRound: { type: Number, default: 0 },
   },
   { _id: false }
 );

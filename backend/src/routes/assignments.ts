@@ -79,7 +79,6 @@ const createAssignmentSchema = z.object({
   }
 );
 
-// POST /api/assignments - Create new assignment
 router.post(
   '/',
   upload.single('file'),
@@ -88,19 +87,14 @@ router.post(
   createAssignment
 );
 
-// GET /api/assignments - Get all assignments
 router.get('/', getAllAssignments);
 
-// GET /api/assignments/:id - Get single assignment with result
 router.get('/:id', getAssignmentById);
 
-// GET /api/assignments/:id/status - Lightweight status check
 router.get('/:id/status', getAssignmentStatus);
 
-// DELETE /api/assignments/:id - Delete assignment
 router.delete('/:id', deleteAssignment);
 
-// POST /api/assignments/:id/regenerate - Regenerate assignment
 router.post('/:id/regenerate', regenerateAssignment);
 
 export default router;
