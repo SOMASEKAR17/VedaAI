@@ -107,7 +107,11 @@ export default function Assignments() {
 
 
   if (!assignments || assignments.length === 0) {
-    return <EmptyState />;
+    return (
+      <div className="h-[80vh] flex justify-center items-center w-full">
+        <EmptyState />
+      </div>
+  )
   }
 
   return (
