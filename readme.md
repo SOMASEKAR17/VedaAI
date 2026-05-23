@@ -1,3 +1,4 @@
+
 # VedaAI -- AI Assessment Creator
 
 > Built by **Somasekar Naidu L** as part of the VedaAI Full Stack Engineer hiring assignment.
@@ -207,14 +208,14 @@ EC2 Instance
 
 | Page | Screenshot |
 |---|---|
-| Assignment Form | *(add screenshot)* |
-| Generating (WebSocket live) | *(add screenshot)* |
-| Result Page | *(add screenshot)* |
-| PDF Export | *(add screenshot)* |
-| Question Bank | *(add screenshot)* |
-| Custom Paper Builder | *(add screenshot)* |
+| Assignment Form | <img width="1899" height="910" alt="Screenshot 2026-05-23 161642" src="https://github.com/user-attachments/assets/db67062b-32db-4fdf-a7b4-26b0a6c56a7f" /> |
+| Generating (WebSocket live) | <img width="1902" height="916" alt="Screenshot 2026-05-23 164846" src="https://github.com/user-attachments/assets/1c29eca7-9be3-4364-ad75-a75e2f4cf6eb" /> |
+| Result Page | <img width="1899" height="911" alt="Screenshot 2026-05-23 161806" src="https://github.com/user-attachments/assets/633a324d-4e39-4f9a-a1be-76c8c8b4a613" />|
+| PDF Export | <img width="1894" height="974" alt="Screenshot 2026-05-23 161916" src="https://github.com/user-attachments/assets/fb8d3a50-29f9-4452-a9b8-baac7f7afea7" />|
+| Custom Paper Builder | <img width="1897" height="869" alt="Screenshot 2026-05-23 190930" src="https://github.com/user-attachments/assets/5dc297e2-211f-41f9-b7a6-50a07ca2eb21" />|
 
----
+---      
+
 
 ## Future Scope
 
