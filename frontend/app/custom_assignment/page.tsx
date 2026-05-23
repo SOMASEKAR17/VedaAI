@@ -74,12 +74,12 @@ function CustomAssignmentContent() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-16 animate-pulse pr-4">
-        <div className="bg-[#252525] rounded-[28px] p-8 text-white flex flex-col gap-4">
+      <div className="flex-1 mt-5 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-16 animate-pulse px-4">
+        <div className="bg-[#252525] rounded-[28px] p-6 sm:p-8 text-white flex flex-col gap-4">
           <div className="h-6 bg-gray-700 rounded w-3/4" />
           <div className="h-4 bg-gray-700 rounded w-1/2" />
         </div>
-        <div className="bg-white rounded-[28px] shadow-sm p-10 sm:p-14 flex flex-col gap-6 min-h-[400px]">
+        <div className="bg-white rounded-[28px] shadow-sm p-6 sm:p-14 flex flex-col gap-6 min-h-[400px]">
           <div className="h-7 bg-gray-200 rounded w-1/3 self-center" />
           <div className="h-5 bg-gray-200 rounded w-1/2 self-center mt-2" />
           <div className="h-16 bg-gray-100 rounded-[18px] w-full mt-6" />
@@ -92,7 +92,7 @@ function CustomAssignmentContent() {
 
   if (!id || !assignment) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 py-20 pr-4">
+      <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 py-20 px-4">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-16 h-16 text-[#7c7c7c]/40">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
@@ -199,10 +199,9 @@ function CustomAssignmentContent() {
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-32 animate-fade-in pr-4 text-left">
+    <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-44 sm:pb-32 animate-fade-in px-4 sm:px-0 text-left">
       
-
-      <div className="bg-[#252525] rounded-[28px] p-8 text-white flex flex-col gap-4 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+      <div className="bg-[#252525] rounded-[28px] p-6 sm:p-8 text-white flex flex-col gap-4 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
         <div className="flex items-center gap-2">
           <Link href={`/assignments/${assignment._id}`} className="text-gray-400 hover:text-white transition-colors">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-5 h-5">
@@ -222,25 +221,23 @@ function CustomAssignmentContent() {
         <div className="flex items-center gap-3 mt-2 flex-wrap">
           <button
             onClick={handleSelectAll}
-            className="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-5 rounded-full text-xs transition-colors cursor-pointer"
+            className="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-5 rounded-full text-xs transition-colors cursor-pointer w-full sm:w-auto"
           >
             Select All
           </button>
           <button
             onClick={handleDeselectAll}
-            className="bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-2 px-5 rounded-full text-xs transition-colors cursor-pointer"
+            className="bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-2 px-5 rounded-full text-xs transition-colors cursor-pointer w-full sm:w-auto"
           >
             Deselect All
           </button>
         </div>
       </div>
 
-
-      <div className="bg-white rounded-[28px] shadow-[0_4px_30px_rgba(0,0,0,0.015)] border border-[#f0f0f0]/60 p-8 sm:p-12 text-[#1c1c1c] flex flex-col mt-4 font-inter leading-relaxed relative">
+      <div className="bg-white rounded-[28px] shadow-[0_4px_30px_rgba(0,0,0,0.015)] border border-[#f0f0f0]/60 p-5 sm:p-12 text-[#1c1c1c] flex flex-col mt-4 font-inter leading-relaxed relative">
         
-
         <div className="flex flex-col items-center text-center gap-1.5 mb-6">
-          <h2 className="text-lg sm:text-xl font-extrabold uppercase tracking-wide text-[#1c1c1c]">
+          <h2 className="text-base sm:text-xl font-extrabold uppercase tracking-wide text-[#1c1c1c] max-w-md sm:max-w-none">
             Delhi Public School, Sector-4, Bokaro
           </h2>
           <div className="flex flex-col gap-0.5 mt-0.5">
@@ -253,7 +250,6 @@ function CustomAssignmentContent() {
           </div>
         </div>
 
-
         {sections.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center gap-2 text-gray-400 py-16">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-12 h-12 text-gray-300">
@@ -264,7 +260,6 @@ function CustomAssignmentContent() {
           </div>
         ) : (
           <div className="flex flex-col gap-8">
-            
             {sections.map((section, sIdx) => (
               <div key={sIdx} className="flex flex-col gap-5 border-b border-gray-100/70 pb-6 last:border-b-0">
                 <div className="text-left border-b border-gray-150 pb-1.5">
@@ -276,7 +271,6 @@ function CustomAssignmentContent() {
                   </p>
                 </div>
 
-
                 <div className="flex flex-col gap-4">
                   {section.questions.map((q) => {
                     const isKept = keptQuestionNumbers.includes(q.questionNumber);
@@ -287,15 +281,14 @@ function CustomAssignmentContent() {
                       <div
                         key={q.questionNumber}
                         onClick={() => handleToggleQuestion(q.questionNumber)}
-                        className={`border rounded-2xl p-5 flex flex-col gap-3 transition-all duration-300 cursor-pointer ${
+                        className={`border rounded-2xl p-4 sm:p-5 flex flex-col gap-3 transition-all duration-300 cursor-pointer ${
                           isKept
                             ? "bg-white border-[#f06e30]/40 shadow-[0_4px_16px_rgba(0,0,0,0.015)] hover:border-[#f06e30]/70"
                             : "bg-[#f8f8f8] border-gray-200 opacity-45 grayscale text-gray-500"
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
                           <div className="flex items-start gap-3">
-
                             <div
                               className={`w-5.5 h-5.5 rounded-lg border flex items-center justify-center transition-all duration-200 mt-0.5 shrink-0 ${
                                 isKept
@@ -307,7 +300,7 @@ function CustomAssignmentContent() {
                                 <polyline points="20 6 9 17 4 12" />
                               </svg>
                             </div>
-                            <div className="flex flex-col gap-1">
+                            <div className="flex flex-col gap-1 w-full">
                               <span className={`text-xs sm:text-[13px] font-bold leading-relaxed font-sans ${isKept ? "text-[#1c1c1c]" : "text-gray-400 line-through"}`}>
                                 Q{q.questionNumber}. [{getDifficultyLabel(q.difficulty)}] {q.text}
                               </span>
@@ -328,13 +321,12 @@ function CustomAssignmentContent() {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center gap-2 shrink-0 self-end sm:self-start">
                             <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-sans tracking-wider shrink-0">
                               {q.marks} Mark{q.marks > 1 ? "s" : ""}
                             </span>
                           </div>
                         </div>
-
 
                         {isKept && (
                           <div 
@@ -375,26 +367,25 @@ function CustomAssignmentContent() {
         )}
       </div>
 
-
-      <div className="fixed bottom-6 left-4 right-4 md:left-[calc(4px+140px)] z-40 flex justify-center select-none max-w-4xl mx-auto w-full">
-        <div className="bg-white/95 backdrop-blur-md rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-150 py-3.5 px-6 sm:px-8 flex items-center justify-between gap-6 w-full animate-fade-in">
+      <div className="fixed bottom-4 left-4 right-4 md:left-[calc(16px+140px)] z-40 flex justify-center select-none max-w-4xl mx-auto w-full">
+        <div className="bg-white/95 backdrop-blur-md rounded-[24px] sm:rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-150 p-4 sm:py-3.5 sm:px-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 sm:gap-6 w-full animate-fade-in">
           <div className="flex flex-col text-left">
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#7c7c7c] font-sans">Live Assessment Totals</span>
-            <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-sm sm:text-base font-extrabold text-[#1c1c1c]">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 mt-0.5">
+              <span className="text-xs sm:text-base font-extrabold text-[#1c1c1c]">
                 {dynamicTotalQuestions} / {sections.flatMap((s) => s.questions).length} Kept
               </span>
-              <span className="text-xs font-bold text-[#7c7c7c]">•</span>
+              <span className="hidden sm:inline text-xs font-bold text-[#7c7c7c]">•</span>
               <span className="text-xs sm:text-sm font-extrabold text-[#f06e30]">
                 {dynamicTotalMarks} / {assignment.totalMarks} Marks
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <Link
               href={`/assignments/${assignment._id}`}
-              className="bg-white hover:bg-gray-100 text-[#1c1c1c] font-bold py-3 px-5 rounded-full text-xs border border-gray-200 transition-colors cursor-pointer"
+              className="bg-white hover:bg-gray-100 text-[#1c1c1c] font-bold py-3 px-4 sm:px-5 rounded-full text-xs border border-gray-200 transition-colors cursor-pointer flex-1 sm:flex-none text-center"
             >
               Cancel
             </Link>
@@ -407,7 +398,7 @@ function CustomAssignmentContent() {
                 setShowDownloadModal(true);
               }}
               disabled={isDownloading || dynamicTotalQuestions === 0}
-              className="bg-[#121212] hover:bg-[#2a2a2a] disabled:bg-[#7c7c7c] text-white font-bold py-3 px-6 sm:px-7 rounded-full text-xs sm:text-[13px] shadow-sm flex items-center transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="bg-[#121212] hover:bg-[#2a2a2a] disabled:bg-[#7c7c7c] text-white font-bold py-3 px-5 sm:px-7 rounded-full text-xs sm:text-[13px] shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex-1 sm:flex-none"
             >
               {isDownloading ? (
                 <>
@@ -426,7 +417,6 @@ function CustomAssignmentContent() {
           </div>
         </div>
       </div>
-
 
       {showDownloadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">

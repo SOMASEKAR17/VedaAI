@@ -27,7 +27,7 @@ export default function EmptyState() {
         </div>
         <Link
           href="/create-assignment" >
-          <button className="flex items-center justify-center gap-2 bg-[#121212] hover:bg-[#2a2a2a] text-white py-2.5 sm:py-3 px-5 sm:px-6 rounded-full font-bold text-xs sm:text-sm tracking-wide shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer font-sans w-full sm:w-auto">
+          <button className=" hidden md:flex items-center justify-center gap-2 bg-[#121212] hover:bg-[#2a2a2a] text-white py-2.5 sm:py-3 px-5 sm:px-6 rounded-full font-bold text-xs sm:text-sm tracking-wide shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer font-sans w-full sm:w-auto">
             <svg
               viewBox="0 0 24 24"
               fill="none"

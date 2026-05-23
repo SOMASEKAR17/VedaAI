@@ -10,13 +10,16 @@ import DatePickerField from "@/components/DatePickerField";
 import QuestionTypeTable from "@/components/QuestionTypeTable";
 import AdditionalInfoField from "@/components/AdditionalInfoField";
 import AssignmentTracker from "@/components/AssignmentTracker";
+import {  useRef } from 'react';
+import gsap from 'gsap';
 
 export default function CreateAssignment() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [createdAssignmentId, setCreatedAssignmentId] = useState<string | null>(null);
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  const pulseRingRef = useRef<HTMLDivElement>(null);
   const {
 
     title,
@@ -58,6 +61,7 @@ export default function CreateAssignment() {
       const totalQuestions = questionTypes.reduce((sum, row) => sum + row.count, 0);
       const totalMarks = questionTypes.reduce((sum, row) => sum + row.count * row.marks, 0);
       const typesArray = questionTypes.map((row) => row.type);
+      
 
       const formData = new FormData();
       formData.append("title", title);
@@ -126,6 +130,34 @@ export default function CreateAssignment() {
   });
 
   useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(containerRef.current, {
+        scale: 1.15,
+        duration: 0.8,
+        yoyo: true,
+        repeat: -1,
+        ease: 'power1.inOut',
+      });
+
+      gsap.fromTo(pulseRingRef.current,
+        { 
+          scale: 1, 
+          opacity: 0.6 
+        },
+        {
+          scale: 3.5,
+          opacity: 0,
+          duration: 1.6,
+          repeat: -1,
+          ease: 'power2.out',
+        }
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -162,11 +194,17 @@ export default function CreateAssignment() {
             </svg>
           </button>
           
-            {!isMobile && (createdAssignmentId ? (
-              <div className="w-3.5 h-3.5 rounded-full bg-[#f06e30] border-2 border-white shadow-sm shrink-0 animate-ping" />
-            ) : (
-              <div className="w-3 h-3 rounded-full bg-[#22c55e] border-2 border-white shadow-sm shrink-0" />
-            ))}
+            {!isMobile && (
+              <div 
+                ref={containerRef} 
+                className="relative w-3.5 h-3.5 hidden md:flex items-center justify-center rounded-full bg-[#4ade80] border border-white shadow-sm shrink-0"
+              >
+                <div 
+                  ref={pulseRingRef} 
+                  className="absolute inset-0 rounded-full bg-[#4ade80] pointer-events-none" 
+                />
+              </div>
+            )}
           <h1 className="text-xl text-center md:text-left sm:text-2xl font-bold tracking-tight text-[#1c1c1c] font-sans transition-all duration-300">
             {createdAssignmentId ? "AI Assessment Creator" : "Create Assignment"}
           </h1>

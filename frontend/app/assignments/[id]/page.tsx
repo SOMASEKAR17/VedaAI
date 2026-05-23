@@ -244,7 +244,7 @@ export default function ViewAssignmentPage({
   }).filter((sec) => sec.questions.length > 0);
 
   return (
-    <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-16 animate-fade-in pr-4 text-left">
+    <div className="flex-1 flex flex-col mt-5 gap-6 select-none max-w-4xl mx-auto w-full pb-16 animate-fade-in pr-4 text-left">
       
 
       <div className="bg-[#252525] rounded-[28px] p-8 text-white flex flex-col gap-5 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
@@ -455,40 +455,40 @@ export default function ViewAssignmentPage({
 
 
       {showDownloadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-[24px] max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative">
-            <button
-              onClick={() => setShowDownloadModal(false)}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-650 p-1.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <div className="flex flex-col gap-1.5 mt-2">
-              <h3 className="text-base font-extrabold text-[#1c1c1c]">Download PDF</h3>
-              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
-                Would you like to include the generated Answer Key in your downloaded PDF document?
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 mt-2">
-              <button
-                onClick={() => handleDownload(true)}
-                className="w-full bg-[#121212] hover:bg-[#2c2c2c] text-white py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-              >
-                Include Answer Key
-              </button>
-              <button
-                onClick={() => handleDownload(false)}
-                className="w-full bg-white hover:bg-gray-55 border border-gray-200 text-[#1c1c1c] py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-              >
-                Only Question Paper
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 z-50 flex justify-center items-start p-4 pt-40 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div className="bg-white rounded-[24px] max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative">
+      <button
+        onClick={() => setShowDownloadModal(false)}
+        className="absolute right-4 top-4 text-gray-400 hover:text-gray-650 p-1.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <div className="flex flex-col gap-1.5 mt-2">
+        <h3 className="text-base font-extrabold text-[#1c1c1c]">Download PDF</h3>
+        <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+          Would you like to include the generated Answer Key in your downloaded PDF document?
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 mt-2">
+        <button
+          onClick={() => handleDownload(true)}
+          className="w-full bg-[#121212] hover:bg-[#2c2c2c] text-white py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+        >
+          Include Answer Key
+        </button>
+        <button
+          onClick={() => handleDownload(false)}
+          className="w-full bg-white hover:bg-gray-55 border border-gray-200 text-[#1c1c1c] py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+        >
+          Only Question Paper
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

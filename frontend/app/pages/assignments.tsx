@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAssignmentStore } from "@/store/useAssignmentStore";
 import EmptyState from "@/components/EmptyState";
+import gsap from 'gsap';
 
 import AssignmentTracker from "@/components/AssignmentTracker";
 import { downloadPDF, deleteAssignment } from "@/lib/api";
@@ -16,11 +17,9 @@ export default function Assignments() {
   const [activeTrackerId, setActiveTrackerId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-
   const [searchQuery, setSearchQuery] = useState("");
   const [filterSubject, setFilterSubject] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
 
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
@@ -28,11 +27,40 @@ export default function Assignments() {
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+  const pulseRingRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(containerRef.current, {
+        scale: 1.15,
+        duration: 0.8,
+        yoyo: true,
+        repeat: -1,
+        ease: 'power1.inOut',
+      });
+
+      gsap.fromTo(pulseRingRef.current,
+        { 
+          scale: 1, 
+          opacity: 0.6 
+        },
+        {
+          scale: 3.5,
+          opacity: 0,
+          duration: 1.6,
+          repeat: -1,
+          ease: 'power2.out',
+        }
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     loadAssignments();
   }, []);
-
 
   useEffect(() => {
     const handleGlobalClick = () => {
@@ -43,7 +71,6 @@ export default function Assignments() {
     return () => window.removeEventListener("click", handleGlobalClick);
   }, []);
 
-
   useEffect(() => {
     const hasActiveJobs = assignments.some(
       (asg) => asg.status === "pending" || asg.status === "processing"
@@ -51,36 +78,30 @@ export default function Assignments() {
 
     if (hasActiveJobs) {
       const interval = setInterval(() => {
-
         loadAssignments();
       }, 5000);
       return () => clearInterval(interval);
     }
   }, [assignments]);
 
-
   const handleViewDetails = (asgId: string) => {
     router.push(`/assignments/${asgId}`);
   };
-
 
   const handleDownloadPDF = async (asgId: string, title: string) => {
     setDownloadingId(asgId);
     try {
       await downloadPDF(asgId, title);
     } catch (err) {
-
     } finally {
       setDownloadingId(null);
     }
   };
 
-
   const handleDeleteAssignment = (asgId: string) => {
     setDeleteConfirmId(asgId);
     setDeleteErrorMessage(null);
   };
-
 
   const formatToDDMMYYYY = (dateStr: string) => {
     try {
@@ -95,9 +116,7 @@ export default function Assignments() {
     }
   };
 
-
   const uniqueSubjects = Array.from(new Set(assignments.map((asg) => asg.subject)));
-
 
   const filteredAssignments = assignments.filter((asg) => {
     const matchesSearch = asg.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -105,67 +124,65 @@ export default function Assignments() {
     return matchesSearch && matchesSubject;
   });
 
-
   if (!assignments || assignments.length === 0) {
     return (
       <div className="h-[80vh] flex justify-center items-center w-full">
         <EmptyState />
       </div>
-  )
+    );
   }
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined') {
+      window.history.back();
+    }
+  };
+
   return (
-    <div className="flex-1 flex flex-col gap-6 select-none max-w-6xl mx-auto w-full pb-32 animate-fade-in pr-4">
+    <div className="flex-1 flex mt-5 flex-col gap-6 select-none max-w-6xl mx-auto w-full pb-44 animate-fade-in pr-4">
       
-
-      {activeTrackerId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-          <div className="bg-white rounded-[32px] overflow-hidden max-w-2xl w-full shadow-2xl p-6 relative">
-            <button
-              onClick={() => setActiveTrackerId(null)}
-              className="absolute right-6 top-6 bg-white hover:bg-gray-100 border p-2 rounded-full cursor-pointer shadow-sm z-55"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 text-gray-500">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <div className="mt-8">
-              <AssignmentTracker
-                assignmentId={activeTrackerId}
-                onComplete={() => {
-                  const id = activeTrackerId;
-                  setActiveTrackerId(null);
-                  loadAssignments();
-                  if (id) {
-                    router.push(`/assignments/${id}`);
-                  }
-                }}
-                onCancel={() => setActiveTrackerId(null)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-
       <div className="flex flex-col gap-0.5 text-left px-1 mt-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center w-full gap-5">
+          <button
+            onClick={handleBack}
+            className="flex items-center md:hidden justify-center w-10 h-10 bg-[#f7f7f7] shadow-md hover:bg-[#d8d8d8] active:bg-[#cccccc] rounded-full transition-colors duration-200 focus:outline-none"
+            aria-label="Go back"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="2.5"
+              stroke="#2e2e2e"
+              className="w-4 h-4 mr-0.5" 
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+          </button>
 
-          <div className="w-3.5 h-3.5 rounded-full bg-[#4ade80] border-2 border-white shadow-sm shrink-0" />
+          <div 
+            ref={containerRef} 
+            className="relative w-3.5 h-3.5 hidden md:flex items-center justify-center rounded-full bg-[#4ade80] border border-white shadow-sm shrink-0"
+          >
+            <div 
+              ref={pulseRingRef} 
+              className="absolute inset-0 rounded-full bg-[#4ade80] pointer-events-none" 
+            />
+          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1c1c1c] font-sans">
             Assignments
           </h1>
         </div>
-        <p className="text-[13px] sm:text-[14px] text-[#7c7c7c] font-semibold font-sans mt-0.5">
+        <p className="text-[13px] hidden md:block sm:text-[14px] text-[#7c7c7c] font-semibold font-sans mt-0.5">
           Manage and create assignments for your classes.
         </p>
       </div>
 
-
       <div className="w-full bg-white rounded-[20px] px-6 py-3.5 flex items-center justify-between shadow-[0_4px_16px_rgba(0,0,0,0.015)] border border-[#f0f0f0]/50 gap-4 mb-2 select-none">
-        
-
         <div className="relative" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -175,7 +192,7 @@ export default function Assignments() {
               <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
             </svg>
             <span className="text-sm font-semibold text-[#7c7c7c] font-sans">
-              {filterSubject ? `Subject: ${filterSubject}` : "Filter By"}
+              {filterSubject ? `Subject: ${filterSubject}` : "Filter"}
             </span>
           </button>
 
@@ -210,7 +227,6 @@ export default function Assignments() {
           )}
         </div>
 
-
         <div className="relative w-full sm:w-[280px]">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3.5 h-3.5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2">
             <circle cx="11" cy="11" r="8" />
@@ -225,7 +241,6 @@ export default function Assignments() {
           />
         </div>
       </div>
-
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6.5 w-full px-1">
         {filteredAssignments.map((asg) => {
@@ -245,7 +260,6 @@ export default function Assignments() {
                   : "cursor-default"
               }`}
             >
-
               <div className="absolute top-7 right-7" onClick={(e) => e.stopPropagation()}>
                 <button
                   onClick={() => setActiveDropdownId(isDropdownOpen ? null : asg._id)}
@@ -257,7 +271,6 @@ export default function Assignments() {
                     <circle cx="12" cy="19" r="2" />
                   </svg>
                 </button>
-
 
                 {isDropdownOpen && (
                   <div className="absolute top-10 right-0 bg-white rounded-[18px] shadow-[0_8px_28px_rgba(0,0,0,0.08)] border border-[#f0f0f0]/60 py-2 min-w-[160px] z-30 animate-fade-in text-left">
@@ -309,7 +322,6 @@ export default function Assignments() {
                 )}
               </div>
 
-
               <div className="flex flex-col text-left pr-8">
                 <h3 className="text-xl sm:text-[22px] font-extrabold text-[#1c1c1c] font-sans leading-snug tracking-tight line-clamp-2">
                   {asg.title}
@@ -340,42 +352,54 @@ export default function Assignments() {
                 )}
               </div>
 
-
               <div className="flex justify-between items-center w-full mt-6 text-[#7c7c7c] text-xs sm:text-[13px] font-semibold font-sans">
-                
-
                 <span>
                   Assigned on : <strong className="font-extrabold text-[#1c1c1c]">{formatToDDMMYYYY(asg.createdAt)}</strong>
                 </span>
-
-
                 <span>
                   Due : <strong className="font-extrabold text-[#1c1c1c]">{formatToDDMMYYYY(asg.dueDate)}</strong>
                 </span>
-                
               </div>
-
             </div>
           );
         })}
       </div>
 
+      
 
-      <div className="fixed bottom-8 left-[50%] md:left-[calc(50%+140px)] transform -translate-x-1/2 z-40 select-none">
-        <Link
-          href="/create-assignment"
-          className="bg-[#121212] hover:bg-[#2a2a2a] text-white py-4 px-8 rounded-full font-extrabold text-xs sm:text-sm shadow-[0_8px_30px_rgba(0,0,0,0.18)] flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.04] active:scale-[0.96]"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-4 h-4 text-white">
-            <path d="M12 5v14M5 12h14" strokeWidth="3" strokeLinecap="round" />
-          </svg>
-          Create Assignment
-        </Link>
-      </div>
+      {activeTrackerId && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-[32px] overflow-hidden max-w-2xl w-full shadow-2xl p-6 relative">
+            <button
+              onClick={() => setActiveTrackerId(null)}
+              className="absolute right-6 top-6 bg-white hover:bg-gray-100 border p-2 rounded-full cursor-pointer shadow-sm z-55"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4 text-gray-500">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div className="mt-8">
+              <AssignmentTracker
+                assignmentId={activeTrackerId}
+                onComplete={() => {
+                  const id = activeTrackerId;
+                  setActiveTrackerId(null);
+                  loadAssignments();
+                  if (id) {
+                    router.push(`/assignments/${id}`);
+                  }
+                }}
+                onCancel={() => setActiveTrackerId(null)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-[24px] max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative animate-scale-up">
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in w-screen h-screen">
+          <div className="bg-white rounded-[24px] max-w-sm w-full p-6 shadow-2xl border border-gray-100 flex flex-col gap-4 font-inter text-left relative animate-scale-up m-auto">
             <button
               onClick={() => {
                 setDeleteConfirmId(null);
@@ -389,14 +413,6 @@ export default function Assignments() {
               </svg>
             </button>
             <div className="flex flex-col gap-1.5 mt-2">
-              <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-1 shrink-0">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  <line x1="10" y1="11" x2="10" y2="17" />
-                  <line x1="14" y1="11" x2="14" y2="17" />
-                </svg>
-              </div>
               <h3 className="text-base font-extrabold text-[#1c1c1c]">Delete Assignment</h3>
               <p className="text-xs text-gray-500 font-semibold leading-relaxed">
                 Are you sure you want to permanently delete this assignment? This action cannot be undone.
@@ -427,7 +443,7 @@ export default function Assignments() {
                     setIsDeleting(false);
                   }
                 }}
-                className="w-full bg-[#e15222] hover:bg-[#c9451a] disabled:bg-red-400 text-white py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full bg-[#121212] hover:bg-[#2c2c2c] disabled:bg-[#7c7c7c] text-white py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5"
               >
                 {isDeleting ? (
                   <>
@@ -444,7 +460,7 @@ export default function Assignments() {
                   setDeleteConfirmId(null);
                   setDeleteErrorMessage(null);
                 }}
-                className="w-full bg-white hover:bg-gray-50 border border-gray-200 text-[#1c1c1c] py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                className="w-full bg-white hover:bg-gray-55 border border-gray-200 text-[#1c1c1c] py-3.5 px-4 rounded-full font-bold text-xs shadow-sm transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
                 Cancel
               </button>
@@ -454,5 +470,6 @@ export default function Assignments() {
       )}
 
     </div>
+    
   );
 }

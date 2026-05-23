@@ -7,6 +7,7 @@ import Topbar from "./Topbar";
 import MobileHeader from "./MobileHeader";
 import MobileBottomNav from "./MobileBottomNav";
 import FAB from "./FAB";
+import Link from "next/link";
 
 export default function LayoutWrapper({
   children,
@@ -87,7 +88,32 @@ export default function LayoutWrapper({
           </div>
           <div className="w-full relative animate-slide-up">
             {children}
+            
           </div>
+          <div className="fixed bottom-0 left-74 right-0 z-[9999] pointer-events-none flex flex-col items-center select-none">
+        
+        <div
+          className="absolute bottom-0 left-0 right-0 h-28"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
+            backdropFilter: 'blur(90px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            background: 'linear-gradient(to top, rgba(255,255,255,0.92) 0%, rgba(150, 150, 150, 0.8) 100%)',
+          }}
+        />
+        <div className="pb-6 pointer-events-auto relative z-10">
+          <Link
+            href="/create-assignment"
+            className="bg-[#121212] hover:bg-[#2a2a2a] text-white py-3 px-5 rounded-full font-bold text-xs shadow-[0_8px_30px_rgba(0,0,0,0.25)] flex items-center gap-1.5 cursor-pointer transition-all duration-200 hover:scale-[1.03] active:scale-[0.97]"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-3.5 h-3.5 text-white">
+              <path d="M12 5v14M5 12h14" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+            Create Assignment
+          </Link>
+        </div>
+      </div>
         </div>
       </div>
 
@@ -103,6 +129,7 @@ export default function LayoutWrapper({
           <MobileBottomNav />
         </div>
       </div>
+      
 
       {isRendered && (
         <div className="fixed inset-0 z-50 flex md:hidden">
