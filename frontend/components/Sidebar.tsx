@@ -70,14 +70,13 @@ export default function Sidebar({ isMobileDrawer = false, onClose }: SidebarProp
           className="font-inter w-full relative p-[1.5px] rounded-full bg-gradient-to-r from-[#e15222] via-[#f06e30] to-[#fb923c] shadow-[0_4px_16px_rgba(240,110,48,0.15)] hover:shadow-[0_6px_20px_rgba(240,110,48,0.25)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer block"
         >
           <div className="flex items-center justify-center gap-2 bg-[#2d2d2d] text-white py-3 px-6 rounded-full font-medium text-sm">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              className="w-4 h-4 text-white"
-            >
-              <path d="M12 5v14M5 12h14" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
+            <Image
+              src="/stars.svg"
+              alt="VedaAI Logo"
+              width={36}
+              height={36}
+              className="w-5 h-5"
+            />
             Create Assignment
           </div>
         </Link>
