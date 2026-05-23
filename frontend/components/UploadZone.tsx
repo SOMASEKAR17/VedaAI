@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useAssignmentStore } from "@/store/useAssignmentStore";
+import Image from 'next/image';
 
 export default function UploadZone() {
   const [dragActive, setDragActive] = useState(false);
@@ -48,7 +49,7 @@ export default function UploadZone() {
         className={`border-2 border-dashed rounded-[24px] p-8 flex flex-col items-center justify-center gap-3 text-center transition-all duration-300 ${
           dragActive
             ? "border-[#f06e30] bg-[#fdf5f2]"
-            : "border-[#dcdcdc] bg-transparent hover:border-[#b0b0b0]"
+            : "border-[#dcdcdc] bg-white hover:border-[#b0b0b0]"
         }`}
       >
         <input
@@ -60,20 +61,13 @@ export default function UploadZone() {
           onChange={handleChange}
         />
 
-        <div className="w-12 h-12 rounded-full bg-[#fdf5f2] flex items-center justify-center text-[#f06e30] mb-1 shadow-sm">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-6 h-6"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="17 8 12 3 7 8" />
-            <line x1="12" y1="3" x2="12" y2="15" />
-          </svg>
+        <div className="w-12 h-12 rounded-full bg-[#dbdbdb] flex items-center justify-center text-[#f06e30] mb-1 shadow-sm">
+          <Image 
+          src={"upload.svg"}
+          alt={"upload"}
+          width={20}
+          height={20}
+          />
         </div>
 
         <span className="text-[#1c1c1c] font-bold text-sm tracking-tight">

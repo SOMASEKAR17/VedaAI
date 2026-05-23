@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { useAssignmentStore } from "@/store/useAssignmentStore";
 import { createAssignment } from "@/lib/api";
 import UploadZone from "@/components/UploadZone";
@@ -112,25 +112,72 @@ export default function CreateAssignment() {
     new Set(Object.keys(errors).map((key) => errors[key]))
   );
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined') {
+      window.history.back();
+    }
+  };
+
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="flex-1 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-10">
+    <div className="flex-1 mt-5 md:mt-0 flex flex-col gap-6 select-none max-w-4xl mx-auto w-full pb-10">
       
       <div className="flex flex-col gap-1 w-full px-1">
-        <div className="flex items-center gap-2 transition-all duration-500">
-          {createdAssignmentId ? (
-            <div className="w-3.5 h-3.5 rounded-full bg-[#f06e30] border-2 border-white shadow-sm shrink-0 animate-ping" />
-          ) : (
-            <div className="w-3 h-3 rounded-full bg-[#22c55e] border-2 border-white shadow-sm shrink-0" />
-          )}
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1c1c1c] font-sans transition-all duration-300">
+        
+        <div className="flex w-full items-center gap-5 transition-all duration-500">
+          <button
+            onClick={handleBack}
+            className="flex items-center md:hidden justify-center w-10 h-10 bg-[#f7f7f7] shadow-2xl hover:bg-[#d8d8d8] active:bg-[#cccccc] rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            aria-label="Go back"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="2.5"
+              stroke="#2e2e2e"
+              className="w-4 h-4 mr-0.5" 
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength="1"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+              />
+            </svg>
+          </button>
+          
+            {!isMobile && (createdAssignmentId ? (
+              <div className="w-3.5 h-3.5 rounded-full bg-[#f06e30] border-2 border-white shadow-sm shrink-0 animate-ping" />
+            ) : (
+              <div className="w-3 h-3 rounded-full bg-[#22c55e] border-2 border-white shadow-sm shrink-0" />
+            ))}
+          <h1 className="text-xl text-center md:text-left sm:text-2xl font-bold tracking-tight text-[#1c1c1c] font-sans transition-all duration-300">
             {createdAssignmentId ? "AI Assessment Creator" : "Create Assignment"}
           </h1>
         </div>
-        <p className="text-[13px] sm:text-sm text-[#7c7c7c] font-medium font-sans transition-all duration-300">
-          {createdAssignmentId 
-            ? "Real-time status updates from our generation engine" 
-            : "Set up a new assignment for your students"}
-        </p>
+        <div className="hidden md:block">
+          <p className="text-[13px] sm:text-sm text-[#7c7c7c] font-medium font-sans transition-all duration-300">
+            {createdAssignmentId 
+              ? "Real-time status updates from our generation engine" 
+              : "Set up a new assignment for your students"}
+          </p>
+        </div>
 
         <div className="w-full bg-[#e5e5e5] h-1 rounded-full overflow-hidden mt-6 flex gap-1">
           <div 
@@ -183,7 +230,7 @@ export default function CreateAssignment() {
 
             <form
               onSubmit={handleSubmit}
-              className="bg-white rounded-[28px] shadow-[0_6px_24px_rgba(0,0,0,0.02)] border border-[#f0f0f0]/50 p-5 sm:p-8 flex flex-col gap-6 sm:gap-7 w-full relative animate-fade-in"
+              className="bg-[#f7f7f7] rounded-[28px] shadow-[0_6px_24px_rgba(0,0,0,0.02)] border border-[#f0f0f0]/50 p-5 sm:p-8 flex flex-col gap-6 sm:gap-7 w-full relative animate-fade-in"
             >
         <div className="flex flex-col gap-0.5 border-b border-[#f5f5f5] pb-4">
           <h2 className="text-lg font-bold text-[#1c1c1c] font-sans tracking-tight">
