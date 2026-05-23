@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function FAB() {
+  const pathname = usePathname();
   return (
     <Link
       href="/create-assignment"
-      className="flex md:hidden fixed bottom-24 right-6 w-14 h-14 bg-white text-[#f06e30] rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 z-40 select-none"
+      className={`flex md:hidden ${pathname != "/" && "hidden"} fixed bottom-24 right-6 w-14 h-14 bg-white text-[#f06e30] rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.15)] items-center justify-center cursor-pointer hover:scale-105 active:scale-95 transition-all duration-200 z-40 select-none`}
     >
       <svg
         viewBox="0 0 24 24"
